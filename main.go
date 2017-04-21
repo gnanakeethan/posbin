@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "github.com/gnanakeethan/pospo5/docs"
 	_ "github.com/gnanakeethan/pospo5/routers"
 
 	"github.com/astaxie/beego"
@@ -19,7 +18,7 @@ func main() {
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
-		beego.BConfig.WebConfig.StaticDir["/app"] = "public/build/bundled"
+		beego.BConfig.WebConfig.StaticDir["/app"] = "public"
 	}
 	beego.InsertFilter("/v1/*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
