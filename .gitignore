@@ -2,3 +2,5 @@ lastupdate*
 swagger
 *.tar.gz
 pospo5
+routers/*
+!routers/router.go
