@@ -48,6 +48,7 @@ func GetSalesById(id int) (v *Sales, err error) {
 	o := orm.NewOrm()
 	v = &Sales{Id: id}
 	if err = o.Read(v); err == nil {
+		_, err = o.LoadRelated(v, "InventoryId")
 		return v, nil
 	}
 	return nil, err
@@ -105,7 +106,7 @@ func GetAllSales(query map[string]string, fields []string, sortby []string, orde
 	}
 
 	var l []Sales
-	qs = qs.OrderBy(sortFields...)
+	qs = qs.OrderBy(sortFields...).RelatedSel()
 	if _, err := qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
 			for _, v := range l {

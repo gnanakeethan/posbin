@@ -54,21 +54,11 @@ func GetAllPurchases(query map[string]string, fields []string, sortby []string, 
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Purchases))
-	likeMap := map[string]bool{
-		"InventoryId__ProductId__Name":        true,
-		"InventoryId__ProductId__Barcode":     true,
-		"InventoryId__ProductId__ProductCode": true,
-	}
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
 		k = strings.Replace(k, ".", "__", -1)
-		if likeMap[k] {
-			//__like condition
-			qs = qs.Filter(k+"__icontains", v)
-		} else {
-			qs = qs.Filter(k, v)
-		}
+		qs = qs.Filter(k, v)
 	}
 	// order by:
 	var sortFields []string
