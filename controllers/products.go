@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 )
 
 // oprations for Products
@@ -133,7 +134,11 @@ func (c *ProductsController) GetAll() {
 			query[k] = v
 		}
 	}
+	logs.Error(sortby)
 
+
+	logs.Info(query)
+	logs.Info(fields)
 	l, err := models.GetAllProducts(query, fields, sortby, order, offset, limit)
 	if err != nil {
 		c.Data["json"] = err.Error()
