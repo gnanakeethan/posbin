@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
 	"github.com/imdario/mergo"
 )
 
@@ -139,18 +138,16 @@ func (c *SalesController) Put() {
 	vi, _ := models.GetSalesById(id)
 	v := models.Sales{Id: id}
 	if err := mergo.Merge(&v, vi); err != nil {
-		logs.Error(err)
-	}
-	logs.Error(vi)
-	logs.Error(v)
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if err := models.UpdateSalesById(&v); err == nil {
-			c.Data["json"] = "OK"
+	} else {
+		if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+			if err := models.UpdateSalesById(&v); err == nil {
+				c.Data["json"] = "OK"
+			} else {
+				c.Data["json"] = err.Error()
+			}
 		} else {
 			c.Data["json"] = err.Error()
 		}
-	} else {
-		c.Data["json"] = err.Error()
 	}
 	c.ServeJSON()
 }
