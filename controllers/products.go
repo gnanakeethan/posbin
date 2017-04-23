@@ -136,7 +136,6 @@ func (c *ProductsController) GetAll() {
 	}
 	logs.Error(sortby)
 
-
 	logs.Info(query)
 	logs.Info(fields)
 	l, err := models.GetAllProducts(query, fields, sortby, order, offset, limit)

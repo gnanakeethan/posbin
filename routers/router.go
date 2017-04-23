@@ -112,6 +112,12 @@ func init() {
 			),
 		),
 
+		beego.NSNamespace("/auth",
+			beego.NSInclude(
+				&controllers.AuthenticationController{},
+			),
+		),
+		//beego.AutoRouter(&controllers.AuthenticationController{}),
 		beego.NSNamespace("/users",
 			beego.NSInclude(
 				&controllers.UsersController{},

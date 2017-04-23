@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
 	"github.com/imdario/mergo"
 )
 
@@ -117,7 +116,6 @@ func (c *SalesController) GetAll() {
 		}
 	}
 
-	logs.Info(query)
 	l, err := models.GetAllSales(query, fields, sortby, order, offset, limit)
 	if err != nil {
 		c.Data["json"] = err.Error()

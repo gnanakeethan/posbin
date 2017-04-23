@@ -7,17 +7,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 )
 
 type Inventories struct {
-	Id        int       `orm:"column(id);auto"`
-	BatchNo   string    `orm:"column(batch_no);size(255)"`
-	Expiry    time.Time `orm:"column(expiry);type(date);null"`
-	ProductId *Products `orm:"column(product_id);rel(fk)"`
-	CreatedAt time.Time `orm:"column(created_at);type(timestamp);null"`
-	UpdatedAt time.Time `orm:"column(updated_at);type(timestamp);null"`
-	Service   int8      `orm:"column(service);null"`
+	Id             int               `orm:"column(id);auto"`
+	BatchNo        string            `orm:"column(batch_no);size(255)"`
+	Expiry         time.Time         `orm:"column(expiry);type(date);null"`
+	ProductId      *Products         `orm:"column(product_id);rel(fk)"`
+	InventoryScale []*InventoryScale `orm:"reverse(many)"`
+	CreatedAt      time.Time         `orm:"column(created_at);type(timestamp);null"`
+	UpdatedAt      time.Time         `orm:"column(updated_at);type(timestamp);null"`
+	Service        int8              `orm:"column(service);null"`
 }
 
 func (t *Inventories) TableName() string {
@@ -102,6 +104,13 @@ func GetAllInventories(query map[string]string, fields []string, sortby []string
 	var l []Inventories
 	qs = qs.OrderBy(sortFields...).RelatedSel()
 	if _, err := qs.Limit(limit, offset).All(&l, fields...); err == nil {
+		newl := []Inventories{}
+		for _, el := range l {
+			o.LoadRelated(&el, "InventoryScale")
+			logs.Info(el)
+			newl = append(newl, el)
+		}
+		l = newl
 		if len(fields) == 0 {
 			for _, v := range l {
 				ml = append(ml, v)
