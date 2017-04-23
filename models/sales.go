@@ -107,7 +107,7 @@ func GetAllSales(query map[string]string, fields []string, sortby []string, orde
 	}
 
 	var l []Sales
-	qs = qs.OrderBy(sortFields...).RelatedSel()
+	qs = qs.OrderBy(sortFields...).RelatedSel("InventoryId__ProductId")
 	if _, err := qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
 			for _, v := range l {
