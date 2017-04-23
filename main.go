@@ -4,7 +4,6 @@ import (
 	_ "github.com/gnanakeethan/pospo5/routers"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/plugins/cors"
 	_ "github.com/go-sql-driver/mysql"
