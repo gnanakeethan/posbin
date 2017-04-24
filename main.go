@@ -21,7 +21,7 @@ func main() {
 	beego.BConfig.Listen.EnableHTTP = false
 	beego.BConfig.Listen.ListenTCP4 = true
 	beego.BConfig.Listen.EnableHTTPS = true
-	beego.BConfig.Listen.HTTPSAddr = ""
+	beego.BConfig.Listen.HTTPSAddr = "0.0.0.0"
 	beego.BConfig.Listen.HTTPSPort = 8443
 	beego.BConfig.Listen.HTTPSCertFile = "conf/cert.pem"
 	beego.BConfig.Listen.HTTPSKeyFile = "conf/key.pem"
