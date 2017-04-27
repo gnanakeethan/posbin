@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/imdario/mergo"
 )
 
@@ -148,6 +149,14 @@ func (c *SalesController) Put() {
 			c.Data["json"] = err.Error()
 		}
 	}
+	if 0 == int(v.Units) {
+		if err := models.DeleteSales(id); err == nil {
+			c.Data["json"] = "Deleted"
+		} else {
+			c.Data["json"] = err.Error()
+		}
+	}
+	logs.Info(int(v.Units))
 	c.ServeJSON()
 }
 
