@@ -15,7 +15,6 @@ func init() {
 }
 
 func main() {
-	orm.Debug = true
 
 	beego.BConfig.EnableGzip = true
 	beego.BConfig.Listen.EnableHTTP = false

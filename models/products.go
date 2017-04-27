@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/astaxie/beego/orm"
-	"github.com/astaxie/beego/logs"
 )
 
 type Products struct {
@@ -72,12 +71,11 @@ func GetAllProducts(query map[string]string, fields []string, sortby []string, o
 		k = strings.Replace(k, ".", "__", -1)
 		if likeMap[k] {
 			//__like condition
-			qs = qs.Filter(k+"__icontains",v )
+			qs = qs.Filter(k+"__icontains", v)
 		} else {
 			qs = qs.Filter(k, v)
 		}
 	}
-	logs.Info(qs)
 	// order by:
 	var sortFields []string
 	if len(sortby) != 0 {
