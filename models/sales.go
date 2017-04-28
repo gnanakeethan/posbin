@@ -108,7 +108,15 @@ func GetAllSales(query map[string]string, fields []string, sortby []string, orde
 
 	var l []Sales
 	qs = qs.OrderBy(sortFields...).RelatedSel("InventoryId__ProductId")
+	o = orm.NewOrm()
 	if _, err := qs.Limit(limit, offset).All(&l, fields...); err == nil {
+		for _, el := range l {
+			inventoryId := el.InventoryId
+			o.LoadRelated(inventoryId, "InventoryScale")
+			for _, il := range el.InventoryId.InventoryScale {
+				o.LoadRelated(il, "ScaleId")
+			}
+		}
 		if len(fields) == 0 {
 			for _, v := range l {
 				ml = append(ml, v)
