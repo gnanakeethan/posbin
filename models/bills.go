@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -53,6 +54,17 @@ func GetBillsById(id int) (v *Bills, err error) {
 	}
 	return nil, err
 }
+func GetPayableBills() (bills []Bills, err error) {
+
+	o := orm.NewOrm()
+
+	sql := fmt.Sprintf("SELECT T0.`id`, T0.`customer_id`, T0.`cost`, T0.`gross_total`, T0.`discount`, T0.`net_total`, T0.`balance`, T0.`card_paid`, T0.`cash_paid`, T0.`user_id`, T0.`terminal_id`, T0.`deleted_at`, T0.`created_at`, T0.`updated_at` FROM `bills` T0 WHERE T0.`balance` >= 0 AND T0.`net_total` >= T0.`cash_paid`+T0.`card_paid`")
+	_, err = o.Raw(sql).QueryRows(&bills)
+	if err == nil {
+		return bills, err
+	}
+	return nil, err
+}
 
 // GetAllBills retrieves all Bills matches certain condition. Returns empty list if
 // no records exist
@@ -64,7 +76,19 @@ func GetAllBills(query map[string]string, fields []string, sortby []string, orde
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
 		k = strings.Replace(k, ".", "__", -1)
+		b := strings.Split(v, "+")
+		if len(b) > 1 {
+			for g, d := range b {
+				b[g] = "bills." + d
+			}
+			v = strings.Join(b, "`+`")
+
+		}
+		logs.Info(v)
+		logs.Info(b)
+
 		qs = qs.Filter(k, v)
+
 	}
 	// order by:
 	var sortFields []string

@@ -62,6 +62,17 @@ func (c *BillsController) GetOne() {
 	c.ServeJSON()
 }
 
+//@router /payable [get]
+func (c *BillsController) GetPayable() {
+	l, err := models.GetPayableBills()
+	if err != nil {
+		c.Data["json"] = err.Error()
+	} else {
+		c.Data["json"] = l
+	}
+	c.ServeJSON()
+}
+
 // @Title Get All
 // @Description get Bills
 // @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
