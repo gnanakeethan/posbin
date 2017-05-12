@@ -4,7 +4,7 @@ echo "Sync script started"
 echo
 
 SRC=$(pwd)
-DEST=ubuntu@52.71.69.255:/home/ubuntu/src/
+DEST=ubuntu@52.70.31.64:/home/ubuntu/src/
 if [ "$SRC" != "" ] ; then
     echo "Syncing $SRC to $DEST"
 
