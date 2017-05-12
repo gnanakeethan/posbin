@@ -10,9 +10,14 @@ import (
 )
 
 func init() {
-	orm.RegisterDataBase("default", "mysql", "root:@tcp(127.0.0.1:3306)/posres")
+	dbdriver := gC("dbdriver")
+	conn := gC(dbdriver+"user") + ":" + gC(dbdriver+"pass") + "@tcp(" + gC(dbdriver+"urls") + ")/" + gC(dbdriver+"db")
+	orm.RegisterDataBase("default", gC("dbdriver"), conn)
 	orm.Debug = true
 
+}
+func gC(conf string) string {
+	return beego.AppConfig.String(conf)
 }
 
 func main() {
@@ -23,9 +28,9 @@ func main() {
 	beego.BConfig.Listen.EnableHTTPS = true
 	beego.BConfig.Listen.HTTPSAddr = "0.0.0.0"
 	beego.BConfig.Listen.HTTPSPort = 8443
-	beego.BConfig.Listen.HTTPSCertFile = "conf/cert.pem"
-	beego.BConfig.Listen.HTTPSKeyFile = "conf/key.pem"
-	beego.BConfig.WebConfig.DirectoryIndex = false
+	beego.BConfig.Listen.HTTPSCertFile = gC("certfile")
+	beego.BConfig.Listen.HTTPSKeyFile = gC("certkey")
+	beego.BConfig.WebConfig.DirectoryIndex = true
 	beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	beego.BConfig.WebConfig.StaticDir["/app"] = "public"
 	beego.InsertFilter("/v1/*", beego.BeforeRouter, cors.Allow(&cors.Options{

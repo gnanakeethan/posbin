@@ -21,8 +21,8 @@ type Bills struct {
 	Balance    float64    `orm:"column(balance);null"`
 	CardPaid   float64    `orm:"column(card_paid);null"`
 	CashPaid   float64    `orm:"column(cash_paid);null"`
-	UserId     *Users     `orm:"column(user_id);rel(fk)"`
-	TerminalId *Terminals `orm:"column(terminal_id);rel(fk)"`
+	UserId     *Users     `orm:"column(user_id);rel(fk)" required:"true"`
+	TerminalId *Terminals `orm:"column(terminal_id);rel(fk)" required:"true"`
 	DeletedAt  time.Time  `orm:"column(deleted_at);type(timestamp);null"`
 	CreatedAt  time.Time  `orm:"column(created_at);type(timestamp);null"`
 	UpdatedAt  time.Time  `orm:"column(updated_at);type(timestamp);null"`

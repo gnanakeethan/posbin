@@ -62,7 +62,10 @@ func (c *BillsController) GetOne() {
 	c.ServeJSON()
 }
 
-//@router /payable [get]
+// @Title Get All Unpaid Bills
+// @Description Returns all Payable Bills with More balance than paid amount
+// @Success 200 {object} []models.Bills
+// @router /payable [get]
 func (c *BillsController) GetPayable() {
 	l, err := models.GetPayableBills()
 	if err != nil {
