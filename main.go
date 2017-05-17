@@ -30,9 +30,9 @@ func main() {
 	beego.BConfig.Listen.HTTPSPort = 8443
 	beego.BConfig.Listen.HTTPSCertFile = gC("certfile")
 	beego.BConfig.Listen.HTTPSKeyFile = gC("certkey")
-	beego.BConfig.WebConfig.DirectoryIndex = true
+	beego.BConfig.WebConfig.DirectoryIndex = false
 	beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
-	beego.BConfig.WebConfig.StaticDir["/app"] = "public"
+	beego.BConfig.WebConfig.StaticDir["/app"] = gC("publicdir")
 	beego.InsertFilter("/v1/*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
