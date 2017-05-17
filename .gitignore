@@ -5,3 +5,4 @@ pospo5
 routers/*
 !routers/router.go
 .idea
+bale*
