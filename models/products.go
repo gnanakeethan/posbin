@@ -138,6 +138,26 @@ func GetAllProducts(query map[string]string, fields []string, sortby []string, o
 	return nil, err
 }
 
+// GetAllProducts retrieves all Products matches certain condition. Returns empty list if
+// no records exist
+func GetBillProducts(query map[string]string) (ml []interface{}, err error) {
+	o := orm.NewOrm()
+	var products []Products;
+	if (query["Barcode"] != "") {
+		query["Barcode"] = strings.Replace(query["Barcode"], " ", "%", 10);
+		query["Barcode"] = "%" + query["Barcode"] + "%";
+		_, err = o.Raw("select * from products where barcode like ? limit 10", query["Barcode"]).QueryRows(&products);
+	} else {
+		query["Name"] = strings.Replace(query["Name"], " ", "%", 10);
+		query["Name"] = "%" + query["Name"] + "%";
+		_, err = o.Raw("select * from products where name like ? or product_code like ?  limit 10", query["Name"], query["Name"]).QueryRows(&products);
+	}
+	for _, v := range products {
+		ml = append(ml, v)
+	}
+	return ml, nil
+}
+
 // UpdateProducts updates Products by Id and returns error if
 // the record to be updated doesn't exist
 func UpdateProductsById(m *Products) (err error) {
