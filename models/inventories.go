@@ -17,6 +17,7 @@ type Inventories struct {
 	Expiry         time.Time         `orm:"column(expiry);type(date);null"`
 	ProductId      *Products         `orm:"column(product_id);rel(fk)"`
 	InventoryScale []*InventoryScale `orm:"reverse(many)"`
+	Purchases      []*Purchases      `orm:"reverse(many)"`
 	CreatedAt      time.Time         `orm:"column(created_at);type(timestamp);null"`
 	UpdatedAt      time.Time         `orm:"column(updated_at);type(timestamp);null"`
 	Service        int8              `orm:"column(service);null"`
@@ -45,6 +46,7 @@ func GetInventoriesById(id int) (v *Inventories, err error) {
 	v = &Inventories{Id: id}
 	if err = o.Read(v); err == nil {
 		_, err = o.LoadRelated(v, "ProductId")
+		_, err = o.LoadRelated(v, "Purchases")
 		return v, nil
 	}
 	return nil, err

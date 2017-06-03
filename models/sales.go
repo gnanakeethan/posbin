@@ -146,6 +146,12 @@ func UpdateSalesById(m *Sales) (err error) {
 	if err = o.Read(&v); err == nil {
 		var num int64
 		inventoryId := m.InventoryId.Id
+		vp, err := GetInventoriesById(inventoryId)
+		cost := 0.0
+		if len(vp.Purchases) > 0 {
+			cost = vp.Purchases[0].AverageCost;
+		}
+
 		units := m.Units
 		var fields []string
 		var sortby []string
@@ -161,6 +167,7 @@ func UpdateSalesById(m *Sales) (err error) {
 		l, err := GetAllInventoryScale(query, fields, sortby, order, offset, limit)
 		remUnits := int(m.Units)
 		m.Total = 0
+		m.Cost = 0
 		for _, el := range l {
 			da, _ := el.(map[string]interface{})
 			price, _ := da["Price"].(float64)
@@ -168,9 +175,9 @@ func UpdateSalesById(m *Sales) (err error) {
 			remt := int(remUnits) % int(scaleunit)
 			times := int(remUnits) / int(scaleunit)
 			m.Total += price * float64(times)
+			m.Cost += cost * float64(times)
 			remUnits = remt
 		}
-		m.Cost = m.Total / m.Units
 		if num, err = o.Update(m); err == nil {
 			fmt.Println("Number of records updated in database:", num)
 		}
