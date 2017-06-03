@@ -13,7 +13,9 @@ func init() {
 	dbdriver := gC("dbdriver")
 	conn := gC(dbdriver+"user") + ":" + gC(dbdriver+"pass") + "@tcp(" + gC(dbdriver+"urls") + ")/" + gC(dbdriver+"db")
 	orm.RegisterDataBase("default", gC("dbdriver"), conn)
-	orm.Debug = true
+	if gC("runmode") == "dev" {
+		orm.Debug = true
+	}
 
 }
 func gC(conf string) string {
@@ -30,9 +32,16 @@ func main() {
 	beego.BConfig.Listen.HTTPSPort = 8443
 	beego.BConfig.Listen.HTTPSCertFile = gC("certfile")
 	beego.BConfig.Listen.HTTPSKeyFile = gC("certkey")
-	beego.BConfig.WebConfig.DirectoryIndex = false
+	beego.BConfig.WebConfig.DirectoryIndex = true
 	beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
-	beego.BConfig.WebConfig.StaticDir["/app"] = gC("publicdir")
+
+	beego.BConfig.WebConfig.StaticDir["/bower_components"] = gC("publicdir") + "/bower_components"
+	beego.BConfig.WebConfig.StaticDir["/src"] = gC("publicdir") + "/src"
+	beego.SetStaticPath("/service-worker.js", gC("publicdir")+"/service-worker.js")
+	beego.SetStaticPath("/index.html", gC("publicdir")+"/index.html")
+	beego.SetStaticPath("/", gC("publicdir")+"/index.html")
+	beego.SetStaticPath("/manifest.json", "public/manifest.json")
+
 	beego.InsertFilter("/v1/*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
