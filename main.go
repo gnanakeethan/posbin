@@ -29,18 +29,22 @@ func main() {
 	beego.BConfig.Listen.ListenTCP4 = true
 	beego.BConfig.Listen.EnableHTTPS = true
 	beego.BConfig.Listen.HTTPSAddr = "0.0.0.0"
-	beego.BConfig.Listen.HTTPSPort = 8443
 	beego.BConfig.Listen.HTTPSCertFile = gC("certfile")
 	beego.BConfig.Listen.HTTPSKeyFile = gC("certkey")
 	beego.BConfig.WebConfig.DirectoryIndex = true
 	beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
+	beego.BConfig.Listen.HTTPSPort = 443
 
-	beego.BConfig.WebConfig.StaticDir["/bower_components"] = gC("publicdir") + "/bower_components"
-	beego.BConfig.WebConfig.StaticDir["/src"] = gC("publicdir") + "/src"
-	beego.SetStaticPath("/service-worker.js", gC("publicdir")+"/service-worker.js")
+	if gC("runmode") != "dev" {
+		beego.SetStaticPath("/service-worker.js", gC("publicdir")+"/service-worker.js")
+		beego.SetStaticPath("/manifest.json", "public/manifest.json")
+	} else {
+		beego.BConfig.Listen.HTTPSPort = 8443
+	}
 	beego.SetStaticPath("/index.html", gC("publicdir")+"/index.html")
 	beego.SetStaticPath("/", gC("publicdir")+"/index.html")
-	beego.SetStaticPath("/manifest.json", "public/manifest.json")
+	beego.BConfig.WebConfig.StaticDir["/bower_components"] = gC("publicdir") + "/bower_components"
+	beego.BConfig.WebConfig.StaticDir["/src"] = gC("publicdir") + "/src"
 
 	beego.InsertFilter("/v1/*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,

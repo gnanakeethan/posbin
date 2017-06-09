@@ -170,7 +170,11 @@ func UpdateSalesById(m *Sales) (err error) {
 		m.Cost = 0
 		for _, el := range l {
 			da, _ := el.(map[string]interface{})
-			price, _ := da["Price"].(float64)
+			price := m.UnitPrice
+			if (m.UnitPrice == 0) {
+				price, _ = da["Price"].(float64)
+				m.UnitPrice = price
+			}
 			scaleunit, _ := da["Units"].(float64)
 			remt := int(remUnits) % int(scaleunit)
 			times := int(remUnits) / int(scaleunit)
