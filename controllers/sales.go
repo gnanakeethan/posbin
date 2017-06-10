@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+
 	"github.com/imdario/mergo"
 )
 
@@ -156,7 +156,7 @@ func (c *SalesController) Put() {
 			c.Data["json"] = err.Error()
 		}
 	}
-	logs.Info(int(v.Units))
+
 	c.ServeJSON()
 }
 

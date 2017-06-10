@@ -3,11 +3,13 @@ package models
 import (
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -149,7 +151,7 @@ func UpdateSalesById(m *Sales) (err error) {
 		vp, err := GetInventoriesById(inventoryId)
 		cost := 0.0
 		if len(vp.Purchases) > 0 {
-			cost = vp.Purchases[0].AverageCost;
+			cost = vp.Purchases[0].AverageCost
 		}
 
 		units := m.Units
@@ -166,21 +168,25 @@ func UpdateSalesById(m *Sales) (err error) {
 		fields = append(fields, "Price", "Units")
 		l, err := GetAllInventoryScale(query, fields, sortby, order, offset, limit)
 		remUnits := int(m.Units)
-		m.Total = 0
-		m.Cost = 0
+		last, _ := l[len(l)-1].(map[string]interface{})
+		m.Total = last["Price"].(float64) * float64(remUnits)
+		m.Cost = cost * float64(remUnits)
+		m.Discount = 0
+		if m.UnitPrice > last["Price"].(float64) {
+			m.UnitPrice = last["Price"].(float64)
+		}
 		for _, el := range l {
 			da, _ := el.(map[string]interface{})
-			price := m.UnitPrice
-			if (m.UnitPrice == 0) {
-				price, _ = da["Price"].(float64)
-				m.UnitPrice = price
-			}
+			price, _ := da["Price"].(float64)
 			scaleunit, _ := da["Units"].(float64)
 			remt := int(remUnits) % int(scaleunit)
 			times := int(remUnits) / int(scaleunit)
-			m.Total += price * float64(times)
-			m.Cost += cost * float64(times)
+			m.Discount += math.Abs(price-m.UnitPrice) * float64(times) * float64(scaleunit)
+			logs.Info(price)
 			remUnits = remt
+			if m.UnitPrice == 0 {
+				m.UnitPrice = price
+			}
 		}
 		if num, err = o.Update(m); err == nil {
 			fmt.Println("Number of records updated in database:", num)

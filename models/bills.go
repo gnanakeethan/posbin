@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
 )
 
 type Bills struct {
@@ -57,19 +57,19 @@ func GetBillsById(id int) (v *Bills, err error) {
 
 func GetUpdatedBill(id int) (v *Bills, err error) {
 	o := orm.NewOrm()
-	sql := fmt.Sprintf("SELECT T0.* FROM `bills` T0 WHERE `id`= %d" ,id)
+	sql := fmt.Sprintf("SELECT T0.* FROM `bills` T0 WHERE `id`= %d", id)
 	//clear := fmt.Sprintf("update");
-	update := fmt.Sprintf("UPDATE " +
-		"bills b," +
-		"(select bill_id, SUM(total) AS total,SUM(discount) AS discount,SUM(cost) as cost FROM sales GROUP BY bill_id) AS bill_total " +
-		"SET " +
-		"b.cost = bill_total.cost," +
-		"b.gross_total = bill_total.total," +
-		"b.net_total = bill_total.total-bill_total.discount, " +
-		"b.discount=bill_total.discount," +
-		"b.balance=(bill_total.total-bill_total.discount)-(b.card_paid+b.cash_paid) " +
-		"WHERE " +
-		"b.id=bill_total.bill_id and b.card_paid+b.cash_paid <= b.net_total and `id` = %d",id)
+	update := fmt.Sprintf("UPDATE "+
+		"bills b,"+
+		"(select bill_id, SUM(total) AS total,SUM(discount) AS discount,SUM(cost) as cost FROM sales GROUP BY bill_id) AS bill_total "+
+		"SET "+
+		"b.cost = bill_total.cost,"+
+		"b.gross_total = bill_total.total,"+
+		"b.net_total = bill_total.total-bill_total.discount, "+
+		"b.discount=bill_total.discount,"+
+		"b.balance=(bill_total.total-bill_total.discount)-(b.card_paid+b.cash_paid) "+
+		"WHERE "+
+		"b.id=bill_total.bill_id and `id` = %d", id)
 	_, err = o.Raw(update).Exec()
 	o.Raw(sql).QueryRow(&v)
 	logs.Info(v)
@@ -80,8 +80,9 @@ func GetUpdatedBill(id int) (v *Bills, err error) {
 }
 func GetPayableBills() (bills []Bills, err error) {
 	o := orm.NewOrm()
-	sql := fmt.Sprintf("SELECT T0.* FROM `bills` T0 WHERE T0.`balance` >= 0 AND T0.`net_total` >= T0.`cash_paid`+T0.`card_paid`")
+	sql := fmt.Sprintf("SELECT T0.* FROM `bills` T0 WHERE (T0.`balance` >= 0 AND T0.`net_total` >= T0.`cash_paid`+T0.`card_paid`) OR T0.`cash_paid`+T0.`card_paid`=0 OR net_total=0")
 	//clear := fmt.Sprintf("update");
+
 	update := fmt.Sprintf("UPDATE " +
 		"bills b," +
 		"(select bill_id, SUM(total) AS total,SUM(discount) AS discount,SUM(cost) as cost FROM sales GROUP BY bill_id) AS bill_total " +
@@ -90,7 +91,7 @@ func GetPayableBills() (bills []Bills, err error) {
 		"b.gross_total = bill_total.total," +
 		"b.net_total = bill_total.total-bill_total.discount, " +
 		"b.discount=bill_total.discount," +
-		"b.balance=(bill_total.total-bill_total.discount)-(b.card_paid+b.cash_paid) " +
+		"b.balance=(bill_total.total-bill_total.discount)-(b.card_paid+b.cash_paid)	 " +
 		"WHERE " +
 		"b.id=bill_total.bill_id and b.card_paid+b.cash_paid <= b.net_total")
 	_, err = o.Raw(update).Exec()
