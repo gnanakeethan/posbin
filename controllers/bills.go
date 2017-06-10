@@ -36,6 +36,7 @@ func (c *BillsController) Post() {
 			c.Ctx.Output.SetStatus(201)
 			c.Data["json"] = v
 		} else {
+
 			c.Data["json"] = err.Error()
 		}
 	} else {
@@ -53,7 +54,7 @@ func (c *BillsController) Post() {
 func (c *BillsController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
-	v, err := models.GetBillsById(id)
+	v, err := models.GetUpdatedBill(id)
 	if err != nil {
 		c.Data["json"] = err.Error()
 	} else {
@@ -151,7 +152,7 @@ func (c *BillsController) Put() {
 	v := models.Bills{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if err := models.UpdateBillsById(&v); err == nil {
-			c.Data["json"] = "OK"
+			c.Data["json"], err = models.GetUpdatedBill(id)
 		} else {
 			c.Data["json"] = err.Error()
 		}

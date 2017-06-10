@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/astaxie/beego/orm"
+	"github.com/astaxie/beego/logs"
 )
 
 type Bills struct {
@@ -50,6 +51,30 @@ func GetBillsById(id int) (v *Bills, err error) {
 	v = &Bills{Id: id}
 	if err = o.Read(v); err == nil {
 		return v, nil
+	}
+	return nil, err
+}
+
+func GetUpdatedBill(id int) (v *Bills, err error) {
+	o := orm.NewOrm()
+	sql := fmt.Sprintf("SELECT T0.* FROM `bills` T0 WHERE `id`= %d" ,id)
+	//clear := fmt.Sprintf("update");
+	update := fmt.Sprintf("UPDATE " +
+		"bills b," +
+		"(select bill_id, SUM(total) AS total,SUM(discount) AS discount,SUM(cost) as cost FROM sales GROUP BY bill_id) AS bill_total " +
+		"SET " +
+		"b.cost = bill_total.cost," +
+		"b.gross_total = bill_total.total," +
+		"b.net_total = bill_total.total-bill_total.discount, " +
+		"b.discount=bill_total.discount," +
+		"b.balance=(bill_total.total-bill_total.discount)-(b.card_paid+b.cash_paid) " +
+		"WHERE " +
+		"b.id=bill_total.bill_id and b.card_paid+b.cash_paid <= b.net_total and `id` = %d",id)
+	_, err = o.Raw(update).Exec()
+	o.Raw(sql).QueryRow(&v)
+	logs.Info(v)
+	if err == nil {
+		return v, err
 	}
 	return nil, err
 }

@@ -28,7 +28,7 @@ func main() {
 
 	beego.BConfig.Listen.ListenTCP4 = true
 	beego.BConfig.Listen.HTTPSAddr = "0.0.0.0"
-
+	beego.BConfig.WebConfig.StaticExtensionsToGzip = []string{".css", ".js", ".html"}
 	if gC("runmode") != "dev" {
 		beego.BConfig.Listen.EnableHTTPS = true
 		beego.BConfig.Listen.HTTPSPort = 443
@@ -42,8 +42,6 @@ func main() {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.Listen.EnableHTTPS = false
 	}
-
-
 	beego.SetStaticPath("/index.html", gC("publicdir")+"/index.html")
 	beego.SetStaticPath("/", gC("publicdir")+"/index.html")
 	beego.BConfig.WebConfig.StaticDir["/bower_components"] = gC("publicdir") + "/bower_components"
