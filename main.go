@@ -14,7 +14,7 @@ func init() {
 	conn := gC(dbdriver+"user") + ":" + gC(dbdriver+"pass") + "@tcp(" + gC(dbdriver+"urls") + ")/" + gC(dbdriver+"db")
 	orm.RegisterDataBase("default", gC("dbdriver"), conn)
 	if gC("runmode") == "dev" {
-		// orm.Debug = true
+		orm.Debug = true
 	}
 
 }
@@ -29,18 +29,18 @@ func main() {
 	beego.BConfig.Listen.ListenTCP4 = true
 	beego.BConfig.Listen.HTTPSAddr = "0.0.0.0"
 	beego.BConfig.WebConfig.StaticExtensionsToGzip = []string{".css", ".js", ".html"}
+	beego.BConfig.Listen.EnableHTTPS = true
+	beego.BConfig.Listen.EnableHTTP = false
+	beego.BConfig.Listen.HTTPSCertFile = gC("certfile")
+	beego.BConfig.Listen.HTTPSKeyFile = gC("certkey")
 	if gC("runmode") != "dev" {
-		beego.BConfig.Listen.EnableHTTPS = true
-		beego.BConfig.Listen.HTTPSPort = 443
-		beego.BConfig.Listen.HTTPSCertFile = gC("certfile")
-		beego.BConfig.Listen.HTTPSKeyFile = gC("certkey")
+		beego.BConfig.Listen.HTTPSPort = 8443
 		beego.SetStaticPath("/service-worker.js", gC("publicdir")+"/service-worker.js")
 		beego.SetStaticPath("/manifest.json", "public/manifest.json")
 	} else {
+		beego.BConfig.Listen.HTTPSPort = 8443
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
-		beego.BConfig.Listen.EnableHTTP = true
 		beego.BConfig.WebConfig.DirectoryIndex = true
-		beego.BConfig.Listen.EnableHTTPS = false
 	}
 	beego.SetStaticPath("/index.html", gC("publicdir")+"/index.html")
 	beego.SetStaticPath("/", gC("publicdir")+"/index.html")
