@@ -153,7 +153,6 @@ func UpdateSalesById(m *Sales) (err error) {
 		if len(vp.Purchases) > 0 {
 			cost = vp.Purchases[0].AverageCost
 		}
-
 		units := m.Units
 		var fields []string
 		var sortby []string
@@ -169,12 +168,14 @@ func UpdateSalesById(m *Sales) (err error) {
 		l, err := GetAllInventoryScale(query, fields, sortby, order, offset, limit)
 		remUnits := int(m.Units)
 		last, _ := l[len(l)-1].(map[string]interface{})
+		// first, _ := l[0].(map[string]interface{})
 		m.Total = last["Price"].(float64) * float64(remUnits)
 		m.Cost = cost * float64(remUnits)
 		m.Discount = 0
-		if m.UnitPrice > last["Price"].(float64) {
+		if m.UnitPrice > last["Price"].(float64) || m.UnitPrice == 0 {
 			m.UnitPrice = last["Price"].(float64)
 		}
+		logs.Info(m)
 		for _, el := range l {
 			da, _ := el.(map[string]interface{})
 			price, _ := da["Price"].(float64)
