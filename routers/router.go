@@ -117,6 +117,11 @@ func init() {
 				&controllers.AuthenticationController{},
 			),
 		),
+		beego.NSNamespace("/printer",
+			beego.NSInclude(
+				&controllers.PrinterController{},
+			),
+		),
 		//beego.AutoRouter(&controllers.AuthenticationController{}),
 		beego.NSNamespace("/users",
 			beego.NSInclude(
