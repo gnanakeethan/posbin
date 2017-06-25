@@ -29,8 +29,6 @@ func main() {
 	beego.BConfig.Listen.ListenTCP4 = true
 	beego.BConfig.Listen.EnableHTTP = false
 	beego.BConfig.Listen.EnableHTTPS = true
-	// beego.BConfig.Listen.HTTPSAddr = "0.0.0.0"
-	// beego.BConfig.Listen.HTTPSPort = 8443
 
 	beego.BConfig.WebConfig.StaticExtensionsToGzip = []string{".css", ".js", ".html"}
 	beego.BConfig.Listen.HTTPSCertFile = gC("certfile")
