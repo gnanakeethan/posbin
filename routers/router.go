@@ -1,10 +1,10 @@
-// @APIVersion 1.0.0
-// @Title beego Test API
-// @Description beego has a very cool tools to autogenerate documents for your API
-// @Contact astaxie@gmail.com
-// @TermsOfServiceUrl http://beego.me/
-// @License Apache 2.0
-// @LicenseUrl http://www.apache.org/licenses/LICENSE-2.0.html
+// @APIVersion 0.2.1-ab
+// @Title POSPo5
+// @Description REST API
+// @Contact kee@pos.run
+// @TermsOfServiceUrl http://www.pos.run/tos
+// @License Proprietary
+// @LicenseUrl http://www.pos.run/license
 package routers
 
 import (
@@ -100,9 +100,19 @@ func init() {
 			),
 		),
 
+		beego.NSNamespace("/stock_flows",
+			beego.NSInclude(
+				&controllers.StockFlowsController{},
+			),
+		),
 		beego.NSNamespace("/stocks",
 			beego.NSInclude(
 				&controllers.StocksController{},
+			),
+		),
+		beego.NSNamespace("/stores",
+			beego.NSInclude(
+				&controllers.StoresController{},
 			),
 		),
 
@@ -130,4 +140,6 @@ func init() {
 		),
 	)
 	beego.AddNamespace(ns)
+
+	beego.Router("/", &controllers.HomeController{}, "*:Index")
 }

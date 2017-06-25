@@ -5,49 +5,54 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/astaxie/beego/orm"
 )
 
-type Stocks struct {
-	Id             int          `orm:"column(id);auto"`
-	AvailableStock float64      `orm:"column(available_stock)"`
-	InventoryId    *Inventories `orm:"column(inventory_id);rel(fk)"`
+type StockFlows struct {
+	Id            int          `orm:"column(id);auto"`
+	Flow          float64      `orm:"column(flow)"`
+	InventoryId   *Inventories `orm:"column(inventory_id);rel(fk)"`
+	StockableId   uint         `orm:"column(stockable_id);null"`
+	StockableType string       `orm:"column(stockable_type);size(255);null"`
+	CreatedAt     time.Time    `orm:"column(created_at);type(timestamp);null"`
+	UpdatedAt     time.Time    `orm:"column(updated_at);type(timestamp);null"`
 }
 
-func (t *Stocks) TableName() string {
-	return "stocks"
+func (t *StockFlows) TableName() string {
+	return "stock_flows"
 }
 
 func init() {
-	orm.RegisterModel(new(Stocks))
+	orm.RegisterModel(new(StockFlows))
 }
 
-// AddStocks insert a new Stocks into database and returns
+// AddStockFlows insert a new StockFlows into database and returns
 // last inserted Id on success.
-func AddStocks(m *Stocks) (id int64, err error) {
+func AddStockFlows(m *StockFlows) (id int64, err error) {
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
 }
 
-// GetStocksById retrieves Stocks by Id. Returns error if
+// GetStockFlowsById retrieves StockFlows by Id. Returns error if
 // Id doesn't exist
-func GetStocksById(id int) (v *Stocks, err error) {
+func GetStockFlowsById(id int) (v *StockFlows, err error) {
 	o := orm.NewOrm()
-	v = &Stocks{Id: id}
+	v = &StockFlows{Id: id}
 	if err = o.Read(v); err == nil {
 		return v, nil
 	}
 	return nil, err
 }
 
-// GetAllStocks retrieves all Stocks matches certain condition. Returns empty list if
+// GetAllStockFlows retrieves all StockFlows matches certain condition. Returns empty list if
 // no records exist
-func GetAllStocks(query map[string]string, fields []string, sortby []string, order []string,
+func GetAllStockFlows(query map[string]string, fields []string, sortby []string, order []string,
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(Stocks))
+	qs := o.QueryTable(new(StockFlows))
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -93,7 +98,7 @@ func GetAllStocks(query map[string]string, fields []string, sortby []string, ord
 		}
 	}
 
-	var l []Stocks
+	var l []StockFlows
 	qs = qs.OrderBy(sortFields...)
 	if _, err := qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
@@ -116,11 +121,11 @@ func GetAllStocks(query map[string]string, fields []string, sortby []string, ord
 	return nil, err
 }
 
-// UpdateStocks updates Stocks by Id and returns error if
+// UpdateStockFlows updates StockFlows by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateStocksById(m *Stocks) (err error) {
+func UpdateStockFlowsById(m *StockFlows) (err error) {
 	o := orm.NewOrm()
-	v := Stocks{Id: m.Id}
+	v := StockFlows{Id: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
@@ -131,15 +136,15 @@ func UpdateStocksById(m *Stocks) (err error) {
 	return
 }
 
-// DeleteStocks deletes Stocks by Id and returns error if
+// DeleteStockFlows deletes StockFlows by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteStocks(id int) (err error) {
+func DeleteStockFlows(id int) (err error) {
 	o := orm.NewOrm()
-	v := Stocks{Id: id}
+	v := StockFlows{Id: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Delete(&Stocks{Id: id}); err == nil {
+		if num, err = o.Delete(&StockFlows{Id: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
 	}
