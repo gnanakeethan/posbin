@@ -24,6 +24,7 @@ type Products struct {
 	CreatedAt   time.Time `orm:"column(created_at);type(timestamp);null"`
 	UpdatedAt   time.Time `orm:"column(updated_at);type(timestamp);null"`
 	Service     int8      `orm:"column(service);null"`
+	StoreId     *Stores   `orm:"column(store_id);rel(fk)"`
 }
 
 func (t *Products) TableName() string {
@@ -116,7 +117,7 @@ func GetAllProducts(query map[string]string, fields []string, sortby []string, o
 	}
 
 	var l []Products
-	qs = qs.OrderBy(sortFields...).RelatedSel()
+	qs = qs.OrderBy(sortFields...)
 	if _, err := qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
 			for _, v := range l {
@@ -142,15 +143,15 @@ func GetAllProducts(query map[string]string, fields []string, sortby []string, o
 // no records exist
 func GetBillProducts(query map[string]string) (ml []interface{}, err error) {
 	o := orm.NewOrm()
-	var products []Products;
-	if (query["Barcode"] != "") {
-		query["Barcode"] = strings.Replace(query["Barcode"], " ", "%", 10);
-		query["Barcode"] = "%" + query["Barcode"] + "%";
-		_, err = o.Raw("select * from products where barcode like ? limit 10", query["Barcode"]).QueryRows(&products);
+	var products []Products
+	if query["Barcode"] != "" {
+		query["Barcode"] = strings.Replace(query["Barcode"], " ", "%", 10)
+		query["Barcode"] = "%" + query["Barcode"] + "%"
+		_, err = o.Raw("select * from products where barcode like ? limit 10", query["Barcode"]).QueryRows(&products)
 	} else {
-		query["Name"] = strings.Replace(query["Name"], " ", "%", 10);
-		query["Name"] = "%" + query["Name"] + "%";
-		_, err = o.Raw("select * from products where name like ? or product_code like ?  limit 10", query["Name"], query["Name"]).QueryRows(&products);
+		query["Name"] = strings.Replace(query["Name"], " ", "%", 10)
+		query["Name"] = "%" + query["Name"] + "%"
+		_, err = o.Raw("select * from products where name like ? or product_code like ?  limit 10", query["Name"], query["Name"]).QueryRows(&products)
 	}
 	for _, v := range products {
 		ml = append(ml, v)

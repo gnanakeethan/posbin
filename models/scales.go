@@ -14,6 +14,7 @@ type Scales struct {
 	Id          int       `orm:"column(id);auto"`
 	Unit        string    `orm:"column(unit);size(255)"`
 	Description string    `orm:"column(description);size(255)"`
+	StoreId     *Stores   `orm:"column(store_id);rel(fk)"`
 	CreatedAt   time.Time `orm:"column(created_at);type(timestamp);null"`
 	UpdatedAt   time.Time `orm:"column(updated_at);type(timestamp);null"`
 }

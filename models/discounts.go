@@ -17,6 +17,7 @@ type Discounts struct {
 	To        time.Time `orm:"column(to);type(datetime)"`
 	Type      string    `orm:"column(type)"`
 	Value     float64   `orm:"column(value)"`
+	StoreId   *Stores   `orm:"column(store_id);rel(fk)"`
 	CreatedAt time.Time `orm:"column(created_at);type(timestamp);null"`
 	UpdatedAt time.Time `orm:"column(updated_at);type(timestamp);null"`
 }

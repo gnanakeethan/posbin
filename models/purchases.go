@@ -17,6 +17,7 @@ type Purchases struct {
 	Units       float64      `orm:"column(units)"`
 	CreatedAt   time.Time    `orm:"column(created_at);type(timestamp);null"`
 	UpdatedAt   time.Time    `orm:"column(updated_at);type(timestamp);null"`
+	StoreId     *Stores      `orm:"column(store_id);rel(fk)"`
 }
 
 func (t *Purchases) TableName() string {
