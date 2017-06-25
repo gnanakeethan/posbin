@@ -27,23 +27,23 @@ func main() {
 	beego.BConfig.EnableGzip = true
 
 	beego.BConfig.Listen.ListenTCP4 = true
-	beego.BConfig.Listen.HTTPSAddr = "0.0.0.0"
-	beego.BConfig.WebConfig.StaticExtensionsToGzip = []string{".css", ".js", ".html"}
-	beego.BConfig.Listen.EnableHTTPS = true
 	beego.BConfig.Listen.EnableHTTP = false
+	beego.BConfig.Listen.EnableHTTPS = true
+	// beego.BConfig.Listen.HTTPSAddr = "0.0.0.0"
+	// beego.BConfig.Listen.HTTPSPort = 8443
+
+	beego.BConfig.WebConfig.StaticExtensionsToGzip = []string{".css", ".js", ".html"}
 	beego.BConfig.Listen.HTTPSCertFile = gC("certfile")
 	beego.BConfig.Listen.HTTPSKeyFile = gC("certkey")
-	if gC("runmode") != "dev" {
-		beego.BConfig.Listen.HTTPSPort = 8443
-		beego.SetStaticPath("/service-worker.js", gC("publicdir")+"/service-worker.js")
-		beego.SetStaticPath("/manifest.json", "public/manifest.json")
-	} else {
-		beego.BConfig.Listen.HTTPSPort = 8443
-		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
-		beego.BConfig.WebConfig.DirectoryIndex = true
-	}
+
+	beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
+	beego.BConfig.WebConfig.DirectoryIndex = true
+
+	beego.SetStaticPath("/service-worker.js", gC("publicdir")+"/service-worker.js")
+	beego.SetStaticPath("/manifest.json", "public/manifest.json")
 	beego.SetStaticPath("/index.html", gC("publicdir")+"/index.html")
 	beego.SetStaticPath("/", gC("publicdir")+"/index.html")
+
 	beego.BConfig.WebConfig.StaticDir["/bower_components"] = gC("publicdir") + "/bower_components"
 	beego.BConfig.WebConfig.StaticDir["/src"] = gC("publicdir") + "/src"
 
