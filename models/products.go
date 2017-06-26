@@ -11,20 +11,21 @@ import (
 )
 
 type Products struct {
-	Id          int       `orm:"column(id);auto"`
-	ProductCode string    `orm:"column(product_code);size(255);null"`
-	Barcode     string    `orm:"column(barcode);size(255);null"`
-	Name        string    `orm:"column(name);size(255)"`
-	Singular    int8      `orm:"column(singular)"`
-	Priority    int8      `orm:"column(priority);null"`
-	Ordering    uint      `orm:"column(ordering);null"`
-	Image       string    `orm:"column(image);null"`
-	ImageType   string    `orm:"column(image_type);null"`
-	ScaleId     *Scales   `orm:"column(scale_id);rel(fk)"`
-	CreatedAt   time.Time `orm:"column(created_at);type(timestamp);null"`
-	UpdatedAt   time.Time `orm:"column(updated_at);type(timestamp);null"`
-	Service     int8      `orm:"column(service);null"`
-	StoreId     *Stores   `orm:"column(store_id);rel(fk)"`
+	Id          int            `orm:"column(id);auto"`
+	ProductCode string         `orm:"column(product_code);size(255);null"`
+	Barcode     string         `orm:"column(barcode);size(255);null"`
+	Name        string         `orm:"column(name);size(255)"`
+	Singular    int8           `orm:"column(singular)"`
+	Inventory   []*Inventories `orm:"reverse(many)"`
+	Priority    int8           `orm:"column(priority);null"`
+	Ordering    uint           `orm:"column(ordering);null"`
+	Image       string         `orm:"column(image);null"`
+	ImageType   string         `orm:"column(image_type);null"`
+	ScaleId     *Scales        `orm:"column(scale_id);rel(fk)"`
+	CreatedAt   time.Time      `orm:"column(created_at);type(timestamp);null"`
+	UpdatedAt   time.Time      `orm:"column(updated_at);type(timestamp);null"`
+	Service     int8           `orm:"column(service);null"`
+	StoreId     *Stores        `orm:"column(store_id);rel(fk)"`
 }
 
 func (t *Products) TableName() string {

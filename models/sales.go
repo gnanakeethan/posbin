@@ -139,6 +139,63 @@ func GetAllSales(query map[string]string, fields []string, sortby []string, orde
 	return nil, err
 }
 
+func UpdateSalesByIdSQL(m *Sales) (err error) {
+	o := orm.NewOrm()
+	v := Sales{Id: m.Id}
+	if err = o.Read(&v); err == nil {
+		var num int64
+		logs.Error(v)
+		// mergo.Merge(&v)
+		m.InventoryId = v.InventoryId
+		m.BillId = v.BillId
+		if m.Units == 0 {
+			m.Units = v.Units
+
+		}
+		if m.UnitPrice == 0 {
+			m.UnitPrice = v.UnitPrice
+
+		}
+		sql := "select p.id,p.name,i.id,purchases.average_cost,ins.price,ins.units from inventories i inner join products p on i.product_id= p.id inner join purchases on purchases.inventory_id = i.id inner join inventory_scale ins on ins.inventory_id=i.id where i.id=? order by units desc"
+
+		var list []orm.Params
+		_, err := o.Raw(sql, v.InventoryId.Id).Values(&list)
+		remUnits := int(m.Units)
+
+		pr, _ := strconv.Atoi(list[0]["price"].(string))
+		av, _ := strconv.Atoi(list[0]["average_cost"].(string))
+		m.Total = float64(pr) * float64(remUnits)
+		m.Cost = float64(av) * float64(remUnits)
+		m.Discount = 0
+		for _, el := range list {
+			pr, _ := strconv.Atoi(el["price"].(string))
+			sc, _ := strconv.Atoi(el["units"].(string))
+			scaleunit := float64(sc)
+			price := float64(pr) / scaleunit
+			logs.Error(scaleunit)
+			logs.Error(price)
+			remt := int(remUnits) % int(scaleunit)
+			times := int(remUnits) / int(scaleunit)
+			m.Discount += (price - m.UnitPrice) * float64(times) * float64(scaleunit)
+			logs.Info(price)
+			logs.Info(m.Discount)
+			remUnits = remt
+			if m.UnitPrice == 0 {
+				m.UnitPrice = price
+			}
+			if m.Discount < 0 {
+				m.UnitPrice = price
+				m.Discount = 0
+			}
+		}
+		if num, err = o.Update(m); err == nil {
+			fmt.Println("Number of records updated in database:", num)
+		}
+
+	}
+	return err
+}
+
 // UpdateSales updates Sales by Id and returns error if
 // the record to be updated doesn't exist
 func UpdateSalesById(m *Sales) (err error) {
@@ -189,6 +246,7 @@ func UpdateSalesById(m *Sales) (err error) {
 				m.UnitPrice = price
 			}
 		}
+		m.Amount = m.Total - m.Discount
 		if num, err = o.Update(m); err == nil {
 			fmt.Println("Number of records updated in database:", num)
 		}
