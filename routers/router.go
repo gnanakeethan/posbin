@@ -1,3 +1,5 @@
+// Package routers implement the routing functionality of the system
+//
 // @APIVersion 0.2.1-ab
 // @Title POSPo5
 // @Description REST API
