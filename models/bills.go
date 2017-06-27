@@ -94,7 +94,7 @@ func GetPayableBills() (bills []Bills, err error) {
 		"b.discount=bill_total.discount," +
 		"b.balance=(bill_total.total-bill_total.discount)-(b.card_paid+b.cash_paid)	 " +
 		"WHERE " +
-		"b.id=bill_total.bill_id and b.card_paid+b.cash_paid <= b.net_total")
+		"b.id=bill_total.bill_id and (b.card_paid+b.cash_paid <= b.net_total or b.net_total<0)")
 	_, err = o.Raw(update).Exec()
 	_, err = o.Raw(sql).QueryRows(&bills)
 	if err == nil {

@@ -1,6 +1,6 @@
 {
     "bale":{
-        "dirs":["public/build/bundled"],
+        "dirs":["public/build/bundled","conf"],
         "import":"github.com/gnanakeethan/pospo5/bale"
     }
 }
