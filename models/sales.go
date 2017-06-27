@@ -139,7 +139,7 @@ func GetAllSales(query map[string]string, fields []string, sortby []string, orde
 	return nil, err
 }
 
-func UpdateSalesByIdSQL(m *Sales) (err error) {
+func UpdateSalesById(m *Sales) (err error) {
 	o := orm.NewOrm()
 	v := Sales{Id: m.Id}
 	if err = o.Read(&v); err == nil {
@@ -161,97 +161,39 @@ func UpdateSalesByIdSQL(m *Sales) (err error) {
 		var list []orm.Params
 		_, err := o.Raw(sql, v.InventoryId.Id).Values(&list)
 		remUnits := int(m.Units)
-
-		pr, _ := strconv.Atoi(list[0]["price"].(string))
-		av, _ := strconv.Atoi(list[0]["average_cost"].(string))
+		pr, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
+		av, _ := strconv.Atoi(list[len(list)-1]["average_cost"].(string))
 		m.Total = float64(pr) * float64(remUnits)
 		m.Cost = float64(av) * float64(remUnits)
+		prv, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
+		if m.UnitPrice > float64(prv) {
+			m.UnitPrice = float64(prv)
+		}
 		m.Discount = 0
 		for _, el := range list {
 			pr, _ := strconv.Atoi(el["price"].(string))
 			sc, _ := strconv.Atoi(el["units"].(string))
 			scaleunit := float64(sc)
 			price := float64(pr) / scaleunit
-			logs.Error(scaleunit)
-			logs.Error(price)
 			remt := int(remUnits) % int(scaleunit)
 			times := int(remUnits) / int(scaleunit)
-			m.Discount += (price - m.UnitPrice) * float64(times) * float64(scaleunit)
-			logs.Info(price)
+			if m.UnitPrice-float64(prv) < 0 {
+				m.Discount += math.Abs(m.UnitPrice-float64(prv)) * float64(times) * float64(scaleunit)
+			} else {
+				m.Discount += math.Abs(price-m.UnitPrice) * float64(times) * float64(scaleunit)
+			}
 			logs.Info(m.Discount)
+			logs.Info(price - float64(prv))
+			logs.Info(m.UnitPrice - float64(prv))
 			remUnits = remt
-			if m.UnitPrice == 0 {
-				m.UnitPrice = price
-			}
-			if m.Discount < 0 {
-				m.UnitPrice = price
-				m.Discount = 0
-			}
 		}
+		m.Amount = m.Total - m.Discount
 		if num, err = o.Update(m); err == nil {
 			fmt.Println("Number of records updated in database:", num)
 		}
 
 	}
 	return err
-}
-
-// UpdateSales updates Sales by Id and returns error if
-// the record to be updated doesn't exist
-func UpdateSalesById(m *Sales) (err error) {
-	o := orm.NewOrm()
-	v := Sales{Id: m.Id}
-	// ascertain id exists in the database
-	if err = o.Read(&v); err == nil {
-		var num int64
-		inventoryId := m.InventoryId.Id
-		vp, err := GetInventoriesById(inventoryId)
-		cost := 0.0
-		if len(vp.Purchases) > 0 {
-			cost = vp.Purchases[0].AverageCost
-		}
-		units := m.Units
-		var fields []string
-		var sortby []string
-		var order []string
-		var query map[string]string = make(map[string]string)
-		var limit int64 = 100
-		var offset int64 = 0
-		query["InventoryId"] = strconv.Itoa(inventoryId)
-		query["Units__lte"] = strconv.FormatFloat(units, 'f', 6, 64)
-		sortby = append(sortby, "Units")
-		order = append(order, "desc")
-		fields = append(fields, "Price", "Units")
-		l, err := GetAllInventoryScale(query, fields, sortby, order, offset, limit)
-		remUnits := int(m.Units)
-		last, _ := l[len(l)-1].(map[string]interface{})
-		// first, _ := l[0].(map[string]interface{})
-		m.Total = last["Price"].(float64) * float64(remUnits)
-		m.Cost = cost * float64(remUnits)
-		m.Discount = 0
-		if m.UnitPrice > last["Price"].(float64) || m.UnitPrice == 0 {
-			m.UnitPrice = last["Price"].(float64)
-		}
-		logs.Info(m)
-		for _, el := range l {
-			da, _ := el.(map[string]interface{})
-			price, _ := da["Price"].(float64)
-			scaleunit, _ := da["Units"].(float64)
-			remt := int(remUnits) % int(scaleunit)
-			times := int(remUnits) / int(scaleunit)
-			m.Discount += math.Abs(price-m.UnitPrice) * float64(times) * float64(scaleunit)
-			logs.Info(price)
-			remUnits = remt
-			if m.UnitPrice == 0 {
-				m.UnitPrice = price
-			}
-		}
-		m.Amount = m.Total - m.Discount
-		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
-		}
-	}
-	return
 }
 
 // DeleteSales deletes Sales by Id and returns error if

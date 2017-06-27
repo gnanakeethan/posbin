@@ -131,37 +131,13 @@ func (c *SalesController) GetAll() {
 // @Param	body		body 	models.Sales	true		"body for Sales content"
 // @Success 200 {object} models.Sales
 // @Failure 403 :id is not int
-// @router /sqlput/:id [put]
-func (c *SalesController) SQLPut() {
-	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
-	v := models.Sales{Id: id}
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if err := models.UpdateSalesByIdSQL(&v); err == nil {
-			c.Data["json"] = "OK"
-		} else {
-			c.Data["json"] = err.Error()
-		}
-	} else {
-		c.Data["json"] = err.Error()
-	}
-
-	c.ServeJSON()
-}
-
-// @Title Update
-// @Description update the Sales
-// @Param	id		path 	string	true		"The id you want to update"
-// @Param	body		body 	models.Sales	true		"body for Sales content"
-// @Success 200 {object} models.Sales
-// @Failure 403 :id is not int
 // @router /:id [put]
 func (c *SalesController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v := models.Sales{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if err := models.UpdateSalesByIdSQL(&v); err == nil {
+		if err := models.UpdateSalesById(&v); err == nil {
 			c.Data["json"] = "OK"
 		} else {
 			c.Data["json"] = err.Error()
