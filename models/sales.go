@@ -159,37 +159,40 @@ func UpdateSalesById(m *Sales) (err error) {
 		sql := "select p.id,p.name,i.id,purchases.average_cost,ins.price,ins.units from inventories i inner join products p on i.product_id= p.id inner join purchases on purchases.inventory_id = i.id inner join inventory_scale ins on ins.inventory_id=i.id where i.id=? order by units desc"
 
 		var list []orm.Params
-		_, err := o.Raw(sql, v.InventoryId.Id).Values(&list)
+		o.Raw(sql, v.InventoryId.Id).Values(&list)
 		remUnits := int(m.Units)
-		pr, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
-		av, _ := strconv.Atoi(list[len(list)-1]["average_cost"].(string))
-		m.Total = float64(pr) * float64(remUnits)
-		m.Cost = float64(av) * float64(remUnits)
-		prv, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
-		if m.UnitPrice > float64(prv) {
-			m.UnitPrice = float64(prv)
-		}
-		m.Discount = 0
-		for _, el := range list {
-			pr, _ := strconv.Atoi(el["price"].(string))
-			sc, _ := strconv.Atoi(el["units"].(string))
-			scaleunit := float64(sc)
-			price := float64(pr) / scaleunit
-			remt := int(remUnits) % int(scaleunit)
-			times := int(remUnits) / int(scaleunit)
-			if m.UnitPrice-float64(prv) < 0 {
-				m.Discount += math.Abs(m.UnitPrice-float64(prv)) * float64(times) * float64(scaleunit)
-			} else {
-				m.Discount += math.Abs(price-m.UnitPrice) * float64(times) * float64(scaleunit)
+		if len(list) > 0 {
+
+			pr, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
+			av, _ := strconv.Atoi(list[len(list)-1]["average_cost"].(string))
+			m.Total = float64(pr) * float64(remUnits)
+			m.Cost = float64(av) * float64(remUnits)
+			prv, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
+			if m.UnitPrice > float64(prv) || m.UnitPrice == 0 {
+				m.UnitPrice = float64(prv)
 			}
-			logs.Info(m.Discount)
-			logs.Info(price - float64(prv))
-			logs.Info(m.UnitPrice - float64(prv))
-			remUnits = remt
-		}
-		m.Amount = m.Total - m.Discount
-		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
+			m.Discount = 0
+			for _, el := range list {
+				pr, _ := strconv.Atoi(el["price"].(string))
+				sc, _ := strconv.Atoi(el["units"].(string))
+				scaleunit := float64(sc)
+				price := float64(pr) / scaleunit
+				remt := int(remUnits) % int(scaleunit)
+				times := int(remUnits) / int(scaleunit)
+				if m.UnitPrice-float64(prv) < 0 {
+					m.Discount += math.Abs(m.UnitPrice-float64(prv)) * float64(times) * float64(scaleunit)
+				} else {
+					m.Discount += math.Abs(price-m.UnitPrice) * float64(times) * float64(scaleunit)
+				}
+				logs.Info(m.Discount)
+				logs.Info(price - float64(prv))
+				logs.Info(m.UnitPrice - float64(prv))
+				remUnits = remt
+			}
+			m.Amount = m.Total - m.Discount
+			if num, err = o.Update(m); err == nil {
+				fmt.Println("Number of records updated in database:", num)
+			}
 		}
 
 	}
