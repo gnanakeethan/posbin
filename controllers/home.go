@@ -1,9 +1,10 @@
 package controllers
 
 import (
+	"strconv"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
-	"strconv"
 )
 
 func gC(conf string) string {
