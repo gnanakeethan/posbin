@@ -1,0 +1,11 @@
+package: github.com/gnanakeethan/pospo5
+import:
+- package: github.com/astaxie/beego
+  version: ~1.8.3
+  subpackages:
+  - context/param
+  - logs
+  - orm
+  - plugins/cors
+- package: github.com/go-sql-driver/mysql
+  version: ~1.3.0

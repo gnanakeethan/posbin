@@ -6,3 +6,4 @@ routers/*
 !routers/router.go
 .idea
 bale*
+vendor
