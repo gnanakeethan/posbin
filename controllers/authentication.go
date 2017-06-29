@@ -36,7 +36,6 @@ func (c *AuthenticationController) Index() {
 // @Description create Bills
 // @Param	body		body 	authentication.AuthenticationRequest	true		"Authentication Request"
 // @Success 200 {object} responses.Authentication
-// @Failure 401 Unauthorized Request
 // @Failure 403 Forbidden Request
 // @router / [post]
 func (c *AuthenticationController) Post() {
