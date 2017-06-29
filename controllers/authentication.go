@@ -43,9 +43,7 @@ func (c *AuthenticationController) Post() {
 	var response responses.Authentication
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if v.Validate() {
-			key, success := auth.Authenticate(&v)
-			response.Success = success
-			response.AuthenticationHeader = key
+			auth.Authenticate(v, &response)
 			c.Data["json"] = response
 		} else {
 
