@@ -7,6 +7,7 @@
 // @TermsOfServiceUrl http://www.pos.run/tos
 // @License Proprietary
 // @LicenseUrl http://www.pos.run/license
+// @SecurityDefinition mySecurityPathNameApiKey apiKey Authorization header "I love auto-generated docs"
 package routers
 
 import (

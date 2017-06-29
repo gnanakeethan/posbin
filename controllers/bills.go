@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 	"strings"
+
+	"github.com/gnanakeethan/posbin/models"
 
 	"github.com/astaxie/beego"
 )
@@ -51,6 +52,7 @@ func (c *BillsController) Post() {
 // @Success 200 {object} models.Bills
 // @Failure 403 :id is empty
 // @router /:id [get]
+// @Security mySecurityPathNameApiKey
 func (c *BillsController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)

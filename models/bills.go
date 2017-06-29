@@ -47,6 +47,7 @@ func AddBills(m *Bills) (id int64, err error) {
 
 // GetBillsById retrieves Bills by Id. Returns error if
 // Id doesn't exist
+// @Security mySecurityPathNameApiKey
 func GetBillsById(id int) (v *Bills, err error) {
 	o := orm.NewOrm()
 	v = &Bills{Id: id}
@@ -79,6 +80,8 @@ func GetUpdatedBill(id int) (v *Bills, err error) {
 	}
 	return nil, err
 }
+
+// @Security mySecurityPathNameApiKey
 func GetPayableBills() (bills []Bills, err error) {
 	o := orm.NewOrm()
 	sql := fmt.Sprintf("SELECT T0.* FROM `bills` T0 WHERE (T0.`balance` >= 0 AND T0.`net_total` >= T0.`cash_paid`+T0.`card_paid`) OR T0.`cash_paid`+T0.`card_paid`=0 OR net_total=0")

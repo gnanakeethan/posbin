@@ -12,14 +12,13 @@ import (
 
 type Users struct {
 	Id            int       `orm:"column(id);auto"`
-	Name          string    `orm:"column(name);size(255)"`
+	Username      string    `orm:"column(username);size(255)"`
 	Email         string    `orm:"column(email);size(255)"`
 	Password      string    `orm:"column(password);size(255)"`
 	RememberToken string    `orm:"column(remember_token);size(100);null"`
 	CreatedAt     time.Time `orm:"column(created_at);type(timestamp);null"`
 	UpdatedAt     time.Time `orm:"column(updated_at);type(timestamp);null"`
-	// StoreId     []*Stores   `orm:"column(store_id);rel(fk)"`
-
+	// StoreId       []*Stores `orm:"column(store_id);rel(fk)"`
 }
 
 func (t *Users) TableName() string {

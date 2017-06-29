@@ -13,3 +13,5 @@ import:
   version: ^1.1.0
 - package: github.com/casbin/casbin
   version: ^0.8.0
+- package: github.com/dgrijalva/jwt-go
+  version: ^3.0.0
