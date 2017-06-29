@@ -1,5 +1,5 @@
-hash: fd6ba05d7e5514ca96eb31ef7f95e41bd008502db27b09b15d89d461d6e2b564
-updated: 2017-06-28T16:30:30.522915991+05:30
+hash: 938ecf770cff8f50c013cbc70e50bfb3cc2105e6967974277d14a35b4c9cdc0a
+updated: 2017-06-29T21:06:21.032972426+05:30
 imports:
 - name: github.com/astaxie/beego
   version: cab8458c1c4a5a3b4bf5192922be620e6dede15b
@@ -14,6 +14,8 @@ imports:
   - session
   - toolbox
   - utils
+- name: github.com/casbin/casbin
+  version: 27a24f1712c2b786be8b3fc996e0c513d35bae67
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: gopkg.in/authboss.v1
