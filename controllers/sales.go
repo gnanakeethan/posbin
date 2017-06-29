@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gnanakeethan/pospo5/models"
+	"github.com/gnanakeethan/posbin/models"
 
 	"github.com/astaxie/beego"
 )

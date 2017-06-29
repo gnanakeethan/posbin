@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gnanakeethan/pospo5/models"
+	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 	"strings"
 

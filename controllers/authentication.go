@@ -2,7 +2,10 @@
 package controllers
 
 import (
+	"encoding/json"
+
 	"github.com/astaxie/beego"
+	"github.com/gnanakeethan/posbin/authentication"
 )
 
 // AuthenticationController operations for Authentication
@@ -14,6 +17,7 @@ type AuthenticationController struct {
 func (c *AuthenticationController) URLMapping() {
 	c.Mapping("Index", c.Index)
 	c.Mapping("Post", c.Post)
+
 	// c.Mapping("AllBlock", c.AllBlock)
 }
 
@@ -27,11 +31,24 @@ func (c *AuthenticationController) Index() {
 
 // Post method is used to send login requests
 //
+// @Description create Bills
+// @Param	body		body 	authentication.AuthenticationRequest	true		"Authentication Request"
+// @Success 201 Successfully Logged In
+// @Failure 401 Unauthorized Request
+// @Failure 403 Forbidden Request
 // @router / [post]
 func (c *AuthenticationController) Post() {
+	var v authentication.AuthenticationRequest
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		if v.Validate() {
+			c.Ctx.Output.SetStatus(201)
+			c.Data["json"] = v
+		} else {
 
-	// email := c.GetString("email")
-	// password := c.GetString("password")
-	c.Data["json"] = "Success"
+			c.Data["json"] = err.Error()
+		}
+	} else {
+		c.Data["json"] = err.Error()
+	}
 	c.ServeJSON()
 }

@@ -1,7 +1,7 @@
 // Package routers implement the routing functionality of the system
 //
 // @APIVersion 0.2.1-ab
-// @Title POSPo5
+// @Title posbin
 // @Description REST API
 // @Contact kee@pos.run
 // @TermsOfServiceUrl http://www.pos.run/tos
@@ -10,7 +10,7 @@
 package routers
 
 import (
-	"github.com/gnanakeethan/pospo5/controllers"
+	"github.com/gnanakeethan/posbin/controllers"
 
 	"github.com/astaxie/beego"
 )

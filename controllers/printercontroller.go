@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
-	"github.com/gnanakeethan/pospo5/models"
+	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 )
 

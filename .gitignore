@@ -1,7 +1,7 @@
 lastupdate*
 swagger
 *.tar.gz
-pospo5
+posbin
 routers/*
 !routers/router.go
 .idea

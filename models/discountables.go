@@ -10,6 +10,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+//Discountables is exported
 type Discountables struct {
 	Id               int        `orm:"column(id);auto"`
 	DiscountId       *Discounts `orm:"column(discount_id);rel(fk)"`

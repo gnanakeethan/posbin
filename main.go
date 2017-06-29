@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "github.com/gnanakeethan/pospo5/routers"
+	_ "github.com/gnanakeethan/posbin/routers"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"

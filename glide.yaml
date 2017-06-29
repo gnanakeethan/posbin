@@ -1,4 +1,4 @@
-package: github.com/gnanakeethan/pospo5
+package: github.com/gnanakeethan/posbin
 import:
 - package: github.com/astaxie/beego
   version: ~1.8.3
