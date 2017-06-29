@@ -1,8 +1,4 @@
-package authentication
-
-import (
-	"fmt"
-)
+package requests
 
 //AuthenticationRequest is used to receive post values for authentication
 type AuthenticationRequest struct {
@@ -16,9 +12,4 @@ func (request AuthenticationRequest) Validate() bool {
 		return true
 	}
 	return false
-}
-
-//Authenticate function defines authentication for user;
-func Authenticate() {
-	fmt.Println("test")
 }

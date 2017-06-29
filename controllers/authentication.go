@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 
 	"github.com/astaxie/beego"
-	"github.com/gnanakeethan/posbin/authentication"
+	"github.com/gnanakeethan/posbin/requests"
+	"github.com/gnanakeethan/posbin/responses"
+	"github.com/gnanakeethan/posbin/src/auth"
 )
 
 // AuthenticationController operations for Authentication
@@ -33,16 +35,19 @@ func (c *AuthenticationController) Index() {
 //
 // @Description create Bills
 // @Param	body		body 	authentication.AuthenticationRequest	true		"Authentication Request"
-// @Success 201 Successfully Logged In
+// @Success 200 {object} responses.Authentication
 // @Failure 401 Unauthorized Request
 // @Failure 403 Forbidden Request
 // @router / [post]
 func (c *AuthenticationController) Post() {
-	var v authentication.AuthenticationRequest
+	var v requests.AuthenticationRequest
+	var response responses.Authentication
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if v.Validate() {
-			c.Ctx.Output.SetStatus(201)
-			c.Data["json"] = v
+			key, success := auth.Authenticate(&v)
+			response.Success = success
+			response.AuthenticationHeader = key
+			c.Data["json"] = response
 		} else {
 
 			c.Data["json"] = err.Error()
