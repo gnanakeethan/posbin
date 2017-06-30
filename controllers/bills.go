@@ -30,6 +30,7 @@ func (c *BillsController) URLMapping() {
 // @Success 201 {int} models.Bills
 // @Failure 403 body is empty
 // @router / [post]
+// @Security ApiKeyAuthentication
 func (c *BillsController) Post() {
 	var v models.Bills
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
@@ -52,7 +53,7 @@ func (c *BillsController) Post() {
 // @Success 200 {object} models.Bills
 // @Failure 403 :id is empty
 // @router /:id [get]
-// @Security mySecurityPathNameApiKey
+// @Security ApiKeyAuthentication
 func (c *BillsController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
@@ -68,6 +69,7 @@ func (c *BillsController) GetOne() {
 // @Title Get All Unpaid Bills
 // @Description Returns all Payable Bills with More balance than paid amount
 // @Success 200 {object} []models.Bills
+// @Security ApiKeyAuthentication
 // @router /payable [get]
 func (c *BillsController) GetPayable() {
 	l, err := models.GetPayableBills()
@@ -89,6 +91,7 @@ func (c *BillsController) GetPayable() {
 // @Param	offset	query	string	false	"Start position of result set. Must be an integer"
 // @Success 200 {object} models.Bills
 // @Failure 403
+// @Security ApiKeyAuthentication
 // @router / [get]
 func (c *BillsController) GetAll() {
 	var fields []string
@@ -147,6 +150,7 @@ func (c *BillsController) GetAll() {
 // @Param	body		body 	models.Bills	true		"body for Bills content"
 // @Success 200 {object} models.Bills
 // @Failure 403 :id is not int
+// @Security ApiKeyAuthentication
 // @router /:id [put]
 func (c *BillsController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
@@ -169,6 +173,7 @@ func (c *BillsController) Put() {
 // @Param	id		path 	string	true		"The id you want to delete"
 // @Success 200 {string} delete success!
 // @Failure 403 id is empty
+// @Security ApiKeyAuthentication
 // @router /:id [delete]
 func (c *BillsController) Delete() {
 	idStr := c.Ctx.Input.Param(":id")

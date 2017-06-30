@@ -17,17 +17,57 @@ type AuthenticationController struct {
 
 // URLMapping is used to map default routes of the controller
 func (c *AuthenticationController) URLMapping() {
-	c.Mapping("Index", c.Index)
+
 	c.Mapping("Post", c.Post)
 
 	// c.Mapping("AllBlock", c.AllBlock)
 }
 
-// Index method is used to catch the root URL request
+// Post method is used to send login requests
 //
-// @router / [get]
-func (c *AuthenticationController) Index() {
-	c.Data["json"] = "Success"
+// @Description create Bills
+// @Param	body		body 	authentication.AuthenticationRefreshRequest	true		"Authentication Request"
+// @Success 200 {object} responses.Authentication
+// @Failure 403 Forbidden Request
+// @router /validate/ [post]
+func (c *AuthenticationController) PostValidate() {
+	var v requests.AuthenticationRefreshRequest
+	var response responses.Authentication
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		if v.Validate() {
+			auth.ValidateToken(v, &response)
+			c.Data["json"] = response
+		} else {
+
+			c.Data["json"] = err.Error()
+		}
+	} else {
+		c.Data["json"] = err.Error()
+	}
+	c.ServeJSON()
+}
+
+// Post method is used to send login requests
+//
+// @Description create Bills
+// @Param	body		body 	authentication.AuthenticationRefreshRequest	true		"Authentication Request"
+// @Success 200 {object} responses.Authentication
+// @Failure 403 Forbidden Request
+// @router /refresh/ [post]
+func (c *AuthenticationController) PostRefresh() {
+	var v requests.AuthenticationRefreshRequest
+	var response responses.Authentication
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		if v.Validate() {
+			auth.RefreshToken(v, &response)
+			c.Data["json"] = response
+		} else {
+
+			c.Data["json"] = err.Error()
+		}
+	} else {
+		c.Data["json"] = err.Error()
+	}
 	c.ServeJSON()
 }
 

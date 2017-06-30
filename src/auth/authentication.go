@@ -3,7 +3,6 @@ package auth
 import (
 	"time"
 
-	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gnanakeethan/posbin/models"
@@ -14,46 +13,82 @@ import (
 
 var user models.Users
 
-type MyCustomClaims struct {
-	UserId int `json:"UserId"`
-	jwt.StandardClaims
-}
-
 //Authenticate function defines authentication for user;
 func Authenticate(v requests.AuthenticationRequest, response *responses.Authentication) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(models.Users))
-	qs.Filter("username", v.Username)
-	qs.One(&user)
+	o.QueryTable(new(models.Users)).Filter("username", v.Username).One(&user)
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(v.Password)); err == nil {
-		// Create a new token object, specifying signing method and the claims
-		// you would like it to contain.
-		logs.Info(user)
-
 		// Create the Claims
-		claims := MyCustomClaims{
+		claims := AuthenticationClaim{
 			UserId: user.Id,
 			StandardClaims: jwt.StandardClaims{
-				ExpiresAt: 15000,
+				ExpiresAt: time.Now().Unix() + 3600,
 				NotBefore: time.Now().Unix(),
 			},
 		}
-
+		signingString := user.Username + user.Email
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		//What the hell is this?
-		mySigningKey := []byte("AllYourBase")
-		tokenString, _ := token.SignedString(mySigningKey)
-		response.Success = true
-		response.AuthenticationHeader = tokenString
+		if response.AuthenticationHeader, err = token.SignedString([]byte(signingString)); err == nil {
+			response.Success = true
+		}
 	}
-
+	return
 }
-
-func validUser(username string, password string) bool {
-
-	return false
+func ValidateToken(v requests.AuthenticationRefreshRequest, response *responses.Authentication) {
+	response.AuthenticationHeader = v.Token
+	claims := AuthenticationClaim{}
+	token, _ := jwt.ParseWithClaims(v.Token, &claims, func(token *jwt.Token) (interface{}, error) {
+		o := orm.NewOrm()
+		vp := &models.Users{Id: claims.UserId}
+		if err := o.Read(vp); err == nil {
+			return []byte(vp.Username + vp.Email), nil
+		}
+		return []byte(""), nil
+	})
+	response.Success = false
+	if _, ok := token.Claims.(*AuthenticationClaim); ok && token.Valid && extendedValidation(v.Token) {
+		response.Success = true
+	}
 }
-
-func getRoles() {
-
+func extendedValidation(token string) bool {
+	o := orm.NewOrm()
+	if count, err := o.QueryTable(new(models.InvalidTokens)).Filter("token", token).Count(); err == nil {
+		if count > 0 {
+			return false
+		}
+	}
+	return true
+}
+func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.Authentication) {
+	response.Success = false
+	response.AuthenticationHeader = ""
+	claims := AuthenticationClaim{}
+	token, _ := jwt.ParseWithClaims(v.Token, &claims, func(token *jwt.Token) (interface{}, error) {
+		o := orm.NewOrm()
+		vp := &models.Users{Id: claims.UserId}
+		if err := o.Read(vp); err == nil {
+			return []byte(vp.Username + vp.Email), nil
+		}
+		return []byte(""), nil
+	})
+	if claims, ok := token.Claims.(*AuthenticationClaim); ok && token.Valid && extendedValidation(v.Token) {
+		o := orm.NewOrm()
+		destroyToken := models.InvalidTokens{Token: v.Token, ValidThru: time.Unix(claims.ExpiresAt, 200)}
+		o.Insert(&destroyToken)
+		vp := &models.Users{Id: claims.UserId}
+		if err := o.Read(vp); err == nil {
+			claims := AuthenticationClaim{
+				UserId: vp.Id,
+				StandardClaims: jwt.StandardClaims{
+					ExpiresAt: time.Now().Unix() + 3600,
+					NotBefore: time.Now().Unix(),
+				},
+			}
+			signingString := vp.Username + vp.Email
+			token = jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+			if response.AuthenticationHeader, err = token.SignedString([]byte(signingString)); err == nil {
+				response.Success = true
+			}
+		}
+	}
 }
