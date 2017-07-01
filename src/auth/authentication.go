@@ -35,7 +35,7 @@ func Authenticate(v requests.AuthenticationRequest, response *responses.Authenti
 	return
 }
 func ValidateToken(v requests.AuthenticationRefreshRequest, response *responses.Authentication) {
-	response.AuthenticationHeader = v.Token
+	response.AuthenticationHeader = ""
 	claims := AuthenticationClaim{}
 	token, _ := jwt.ParseWithClaims(v.Token, &claims, func(token *jwt.Token) (interface{}, error) {
 		o := orm.NewOrm()

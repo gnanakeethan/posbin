@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gnanakeethan/posbin/controllers"
 	_ "github.com/gnanakeethan/posbin/routers"
 
 	"github.com/astaxie/beego"
@@ -51,7 +52,8 @@ func main() {
 	beego.BConfig.WebConfig.StaticDir["/bower_components"] = gC("publicdir") + "/bower_components"
 	beego.BConfig.WebConfig.StaticDir["/src"] = gC("publicdir") + "/src"
 
-	//CORS Filter for allowing requests to API
+	beego.InsertFilter("/v1/*", beego.BeforeRouter, controllers.AuthenticateUser, true)
+
 	beego.InsertFilter("/v1/*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},

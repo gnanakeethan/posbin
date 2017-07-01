@@ -144,5 +144,7 @@ func init() {
 	)
 	beego.AddNamespace(ns)
 
+	beego.ErrorController(&controllers.ErrorController{})
+
 	beego.Router("/", &controllers.HomeController{}, "*:Index")
 }

@@ -3,8 +3,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context"
 	"github.com/gnanakeethan/posbin/requests"
 	"github.com/gnanakeethan/posbin/responses"
 	"github.com/gnanakeethan/posbin/src/auth"
@@ -15,12 +17,26 @@ type AuthenticationController struct {
 	beego.Controller
 }
 
+var AuthenticateUser = func(ctx *context.Context) {
+	versionString := "/v1/"
+	request := ctx.Request.RequestURI
+	request = strings.Replace(request, versionString, "", 1)
+	if !strings.HasPrefix(request, "auth") {
+		response := responses.Authentication{}
+		token := ctx.Request.Header.Get("Authorization")
+		if token != "" {
+			auth.ValidateToken(requests.AuthenticationRefreshRequest{Token: token}, &response)
+		}
+		if !response.Success {
+			ctx.Abort(401, string("ftesin"))
+		}
+
+	}
+}
+
 // URLMapping is used to map default routes of the controller
 func (c *AuthenticationController) URLMapping() {
 
-	c.Mapping("Post", c.Post)
-
-	// c.Mapping("AllBlock", c.AllBlock)
 }
 
 // Post method is used to send login requests
