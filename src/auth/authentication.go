@@ -3,6 +3,7 @@ package auth
 import (
 	"time"
 
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gnanakeethan/posbin/models"
@@ -28,14 +29,15 @@ func Authenticate(v requests.AuthenticationRequest, response *responses.Authenti
 		}
 		signingString := user.Username + user.Email
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		if response.AuthenticationHeader, err = token.SignedString([]byte(signingString)); err == nil {
+		if response.Token, err = token.SignedString([]byte(signingString)); err == nil {
 			response.Success = true
 		}
 	}
 	return
 }
 func ValidateToken(v requests.AuthenticationRefreshRequest, response *responses.Authentication) {
-	response.AuthenticationHeader = ""
+	logs.Info(time.Local)
+	response.Token = ""
 	claims := AuthenticationClaim{}
 	token, _ := jwt.ParseWithClaims(v.Token, &claims, func(token *jwt.Token) (interface{}, error) {
 		o := orm.NewOrm()
@@ -48,7 +50,7 @@ func ValidateToken(v requests.AuthenticationRefreshRequest, response *responses.
 
 	response.Success = false
 	if _, ok := token.Claims.(*AuthenticationClaim); ok && token.Valid && extendedValidation(v.Token) && permissionCheck(claims.UserId) {
-
+		response.Token = v.Token
 		response.Success = true
 	}
 }
@@ -69,7 +71,7 @@ func extendedValidation(token string) bool {
 }
 func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.Authentication) {
 	response.Success = false
-	response.AuthenticationHeader = ""
+	response.Token = ""
 	claims := AuthenticationClaim{}
 	token, _ := jwt.ParseWithClaims(v.Token, &claims, func(token *jwt.Token) (interface{}, error) {
 		o := orm.NewOrm()
@@ -81,7 +83,8 @@ func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.A
 	})
 	if claims, ok := token.Claims.(*AuthenticationClaim); ok && token.Valid && extendedValidation(v.Token) {
 		o := orm.NewOrm()
-		destroyToken := models.InvalidTokens{Token: v.Token, ValidThru: time.Unix(claims.ExpiresAt, 200)}
+		_, offset := time.Now().Zone()
+		destroyToken := models.InvalidTokens{Token: v.Token, ValidThru: time.Unix(claims.ExpiresAt+int64(offset), 200)}
 		o.Insert(&destroyToken)
 		vp := &models.Users{Id: claims.UserId}
 		if err := o.Read(vp); err == nil {
@@ -94,7 +97,7 @@ func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.A
 			}
 			signingString := vp.Username + vp.Email
 			token = jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-			if response.AuthenticationHeader, err = token.SignedString([]byte(signingString)); err == nil {
+			if response.Token, err = token.SignedString([]byte(signingString)); err == nil {
 				response.Success = true
 			}
 		}

@@ -3,11 +3,13 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
 	"github.com/gnanakeethan/posbin/requests"
 	"github.com/gnanakeethan/posbin/responses"
 	"github.com/gnanakeethan/posbin/src/auth"
@@ -56,14 +58,14 @@ func (c *AuthenticationController) URLMapping() {
 func (c *AuthenticationController) PostValidate() {
 	var v requests.AuthenticationRefreshRequest
 	var response responses.Authentication
+
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		logs.Info(v.Token)
 		if v.Validate() {
 			auth.ValidateToken(v, &response)
-			c.Data["json"] = response
-		} else {
-
-			c.Data["json"] = err.Error()
 		}
+		c.Data["json"] = response
+
 	} else {
 		c.Data["json"] = err.Error()
 	}
@@ -80,6 +82,12 @@ func (c *AuthenticationController) PostValidate() {
 func (c *AuthenticationController) PostRefresh() {
 	var v requests.AuthenticationRefreshRequest
 	var response responses.Authentication
+	go func() {
+		o := orm.NewOrm()
+		sql := fmt.Sprintf("delete from invalid_tokens where valid_thru < now()")
+		_, err := o.Raw(sql).Exec()
+		logs.Error(err)
+	}()
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if v.Validate() {
 			auth.RefreshToken(v, &response)
@@ -107,11 +115,9 @@ func (c *AuthenticationController) Post() {
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if v.Validate() {
 			auth.Authenticate(v, &response)
-			c.Data["json"] = response
-		} else {
-
-			c.Data["json"] = err.Error()
 		}
+		c.Data["json"] = response
+
 	} else {
 		c.Data["json"] = err.Error()
 	}

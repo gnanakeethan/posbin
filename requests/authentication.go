@@ -1,5 +1,7 @@
 package requests
 
+import "github.com/astaxie/beego/logs"
+
 //AuthenticationRequest is used to receive post values for authentication
 type AuthenticationRequest struct {
 	Username string `json:"username"`
@@ -20,6 +22,7 @@ func (request AuthenticationRequest) Validate() bool {
 
 //Validate function defined the validation functionality for request
 func (request AuthenticationRefreshRequest) Validate() bool {
+	logs.Error(request.Token)
 	if request.Token != "" {
 		return true
 	}
