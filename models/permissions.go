@@ -17,6 +17,7 @@ type Permissions struct {
 	Description string    `orm:"column(description);size(255);null"`
 	CreatedAt   time.Time `orm:"column(created_at);type(timestamp);null"`
 	UpdatedAt   time.Time `orm:"column(updated_at);type(timestamp);null"`
+	Roles       []*Roles  `orm:"reverse(many)"`
 }
 
 func (t *Permissions) TableName() string {

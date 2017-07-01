@@ -7,6 +7,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
+	"github.com/astaxie/beego/logs"
 	"github.com/gnanakeethan/posbin/requests"
 	"github.com/gnanakeethan/posbin/responses"
 	"github.com/gnanakeethan/posbin/src/auth"
@@ -27,8 +28,14 @@ var AuthenticateUser = func(ctx *context.Context) {
 		if token != "" {
 			auth.ValidateToken(requests.AuthenticationRefreshRequest{Token: token}, &response)
 		}
-		if !response.Success {
-			ctx.Abort(401, string("ftesin"))
+		logs.Info(token)
+
+		if response.Success {
+
+		} else {
+			if beego.AppConfig.String("runmode") != "dev" {
+				ctx.Abort(401, string("ftesin"))
+			}
 		}
 
 	}

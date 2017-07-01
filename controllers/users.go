@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 	"strings"
+
+	"github.com/gnanakeethan/posbin/models"
 
 	"github.com/astaxie/beego"
 )
@@ -50,6 +51,7 @@ func (c *UsersController) Post() {
 // @Success 200 {object} models.Users
 // @Failure 403 :id is empty
 // @router /:id [get]
+// @Security ApiKeyAuthentication
 func (c *UsersController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)

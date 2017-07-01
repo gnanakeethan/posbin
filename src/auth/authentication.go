@@ -45,10 +45,18 @@ func ValidateToken(v requests.AuthenticationRefreshRequest, response *responses.
 		}
 		return []byte(""), nil
 	})
+
 	response.Success = false
-	if _, ok := token.Claims.(*AuthenticationClaim); ok && token.Valid && extendedValidation(v.Token) {
+	if _, ok := token.Claims.(*AuthenticationClaim); ok && token.Valid && extendedValidation(v.Token) && permissionCheck(claims.UserId) {
+
 		response.Success = true
 	}
+}
+
+//permissionCheck to be implemneted
+func permissionCheck(userID int) bool {
+
+	return true
 }
 func extendedValidation(token string) bool {
 	o := orm.NewOrm()

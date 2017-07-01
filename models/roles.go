@@ -11,12 +11,14 @@ import (
 )
 
 type Roles struct {
-	Id          int       `orm:"column(id);auto"`
-	Name        string    `orm:"column(name);size(255)"`
-	DisplayName string    `orm:"column(display_name);size(255);null"`
-	Description string    `orm:"column(description);size(255);null"`
-	CreatedAt   time.Time `orm:"column(created_at);type(timestamp);null"`
-	UpdatedAt   time.Time `orm:"column(updated_at);type(timestamp);null"`
+	Id          int            `orm:"column(id);auto"`
+	Name        string         `orm:"column(name);size(255)"`
+	DisplayName string         `orm:"column(display_name);size(255);null"`
+	Description string         `orm:"column(description);size(255);null"`
+	CreatedAt   time.Time      `orm:"column(created_at);type(timestamp);null"`
+	UpdatedAt   time.Time      `orm:"column(updated_at);type(timestamp);null"`
+	Users       []*Users       `orm:"reverse(many)"`
+	Permissions []*Permissions `orm:"rel(m2m);rel_through(github.com/gnanakeethan/posbin/models.PermissionRole)"`
 }
 
 func (t *Roles) TableName() string {

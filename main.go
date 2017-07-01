@@ -15,7 +15,7 @@ func init() {
 	conn := gC(dbdriver+"user") + ":" + gC(dbdriver+"pass") + "@tcp(" + gC(dbdriver+"urls") + ")/" + gC(dbdriver+"db")
 	orm.RegisterDataBase("default", gC("dbdriver"), conn)
 	if gC("runmode") == "dev" {
-		// orm.Debug = true
+		orm.Debug = true
 	}
 
 }
