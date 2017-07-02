@@ -13,6 +13,7 @@ import (
 )
 
 var user models.Users
+var validTime int64 = 3600
 
 //Authenticate function defines authentication for user;
 func Authenticate(v requests.AuthenticationRequest, response *responses.Authentication) {
@@ -23,7 +24,7 @@ func Authenticate(v requests.AuthenticationRequest, response *responses.Authenti
 		claims := AuthenticationClaim{
 			UserId: user.Id,
 			StandardClaims: jwt.StandardClaims{
-				ExpiresAt: time.Now().Unix() + 3600,
+				ExpiresAt: time.Now().Unix() + validTime,
 				NotBefore: time.Now().Unix(),
 			},
 		}
@@ -94,7 +95,7 @@ func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.A
 			claims := AuthenticationClaim{
 				UserId: vp.Id,
 				StandardClaims: jwt.StandardClaims{
-					ExpiresAt: time.Now().Unix() + 3600,
+					ExpiresAt: time.Now().Unix() + validTime,
 					NotBefore: time.Now().Unix(),
 				},
 			}

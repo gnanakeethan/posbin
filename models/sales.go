@@ -150,11 +150,9 @@ func UpdateSalesById(m *Sales) (err error) {
 		m.BillId = v.BillId
 		if m.Units == 0 {
 			m.Units = v.Units
-
 		}
-		if m.UnitPrice == 0 {
+		if m.UnitPrice <= 0 {
 			m.UnitPrice = v.UnitPrice
-
 		}
 		sql := "select p.id,p.name,i.id,purchases.average_cost,ins.price,ins.units from inventories i inner join products p on i.product_id= p.id inner join purchases on purchases.inventory_id = i.id inner join inventory_scale ins on ins.inventory_id=i.id where i.id=? order by units desc"
 
