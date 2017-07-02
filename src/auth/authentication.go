@@ -83,9 +83,12 @@ func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.A
 	})
 	if claims, ok := token.Claims.(*AuthenticationClaim); ok && token.Valid && extendedValidation(v.Token) {
 		o := orm.NewOrm()
-		_, offset := time.Now().Zone()
-		destroyToken := models.InvalidTokens{Token: v.Token, ValidThru: time.Unix(claims.ExpiresAt+int64(offset), 200)}
-		o.Insert(&destroyToken)
+		go func(v requests.AuthenticationRefreshRequest) {
+			_, offset := time.Now().Zone()
+			destroyToken := models.InvalidTokens{Token: v.Token, ValidThru: time.Unix(claims.ExpiresAt+int64(offset), 200)}
+			o.Insert(&destroyToken)
+		}(v)
+
 		vp := &models.Users{Id: claims.UserId}
 		if err := o.Read(vp); err == nil {
 			claims := AuthenticationClaim{
@@ -101,5 +104,6 @@ func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.A
 				response.Success = true
 			}
 		}
+
 	}
 }

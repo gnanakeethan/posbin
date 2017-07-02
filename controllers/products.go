@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 	"strings"
+
+	"github.com/gnanakeethan/posbin/models"
 
 	"github.com/astaxie/beego"
 )
@@ -155,6 +156,11 @@ func (c *ProductsController) GetAll() {
 // @router /bill [get]
 func (c *ProductsController) GetBill() {
 	var query map[string]string = make(map[string]string)
+	var limit int64 = 10
+	// limit: 10 (default is 10)
+	if v, err := c.GetInt64("limit"); err == nil {
+		limit = v
+	}
 	if v := c.GetString("query"); v != "" {
 		for _, cond := range strings.Split(v, ",") {
 			kv := strings.Split(cond, ":")
@@ -167,7 +173,7 @@ func (c *ProductsController) GetBill() {
 			query[k] = v
 		}
 	}
-	l, err := models.GetBillProducts(query)
+	l, err := models.GetBillProducts(query, limit)
 	if err != nil {
 		c.Data["json"] = err.Error()
 	} else {

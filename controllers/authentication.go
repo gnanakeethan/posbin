@@ -35,9 +35,9 @@ var AuthenticateUser = func(ctx *context.Context) {
 		if response.Success {
 
 		} else {
-			if beego.AppConfig.String("runmode") != "dev" {
-				ctx.Abort(401, string("ftesin"))
-			}
+			// if beego.AppConfig.String("runmode") != "dev" {
+			ctx.Abort(401, string("ftesin"))
+			// }
 		}
 
 	}
