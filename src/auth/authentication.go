@@ -39,6 +39,7 @@ func Authenticate(v requests.AuthenticationRequest, response *responses.Authenti
 func ValidateToken(v requests.AuthenticationRefreshRequest, response *responses.Authentication) {
 	logs.Info(time.Local)
 	response.Token = ""
+	response.Success = false
 	claims := AuthenticationClaim{}
 	token, _ := jwt.ParseWithClaims(v.Token, &claims, func(token *jwt.Token) (interface{}, error) {
 		o := orm.NewOrm()
@@ -49,7 +50,6 @@ func ValidateToken(v requests.AuthenticationRefreshRequest, response *responses.
 		return []byte(""), nil
 	})
 
-	response.Success = false
 	if _, ok := token.Claims.(*AuthenticationClaim); ok && token.Valid && extendedValidation(v.Token) && permissionCheck(claims.UserId) {
 		response.Token = v.Token
 		response.Success = true

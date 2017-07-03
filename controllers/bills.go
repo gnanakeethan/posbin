@@ -7,13 +7,11 @@ import (
 	"strings"
 
 	"github.com/gnanakeethan/posbin/models"
-
-	"github.com/astaxie/beego"
 )
 
 // oprations for Bills
 type BillsController struct {
-	beego.Controller
+	TokenController
 }
 
 func (c *BillsController) URLMapping() {
