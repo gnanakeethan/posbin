@@ -34,8 +34,6 @@ func main() {
 	beego.BConfig.Listen.ListenTCP4 = true
 
 	//Configuring HTTPs Mode
-	beego.BConfig.Listen.EnableHTTP = false
-	beego.BConfig.Listen.EnableHTTPS = true
 	beego.BConfig.Listen.HTTPSCertFile = gC("certfile")
 	beego.BConfig.Listen.HTTPSKeyFile = gC("certkey")
 
