@@ -182,9 +182,7 @@ func UpdateSalesById(m *Sales) (err error) {
 				} else {
 					m.Discount += math.Abs(price-m.UnitPrice) * float64(times) * float64(scaleunit)
 				}
-				logs.Info(m.Discount)
-				logs.Info(price - float64(prv))
-				logs.Info(m.UnitPrice - float64(prv))
+
 				remUnits = remt
 			}
 			m.Amount = m.Total - m.Discount

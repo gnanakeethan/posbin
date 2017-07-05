@@ -24,9 +24,10 @@ type Bills struct {
 	UserId     *Users     `orm:"column(user_id);rel(fk)" required:"true"`
 	TerminalId *Terminals `orm:"column(terminal_id);rel(fk)" required:"true"`
 	DeletedAt  time.Time  `orm:"column(deleted_at);type(timestamp);null"`
-	CreatedAt  time.Time  `orm:"column(created_at);type(timestamp);null"`
-	UpdatedAt  time.Time  `orm:"column(updated_at);type(timestamp);null"`
+	CreatedAt  time.Time  `orm:"auto_now_add;column(created_at);type(timestamp);null"`
+	UpdatedAt  time.Time  `orm:"auto_now;column(updated_at);type(timestamp);null"`
 	StoreId    *Stores    `orm:"column(store_id);rel(fk)"`
+	Closed     bool       `orm:"column(closed)"`
 }
 
 func (t *Bills) TableName() string {
@@ -65,6 +66,7 @@ func GetUpdatedBill(id int) (v *Bills, err error) {
 		"bills b,"+
 		"(select bill_id, SUM(total) AS total,SUM(discount) AS discount,SUM(cost) as cost FROM sales GROUP BY bill_id) AS bill_total "+
 		"SET "+
+		"b.closed=1,"+
 		"b.cost = bill_total.cost,"+
 		"b.gross_total = bill_total.total,"+
 		"b.net_total = bill_total.total-bill_total.discount, "+
@@ -84,7 +86,7 @@ func GetUpdatedBill(id int) (v *Bills, err error) {
 // @Security mySecurityPathNameApiKey
 func GetPayableBills() (bills []Bills, err error) {
 	o := orm.NewOrm()
-	sql := fmt.Sprintf("SELECT T0.* FROM `bills` T0 WHERE (T0.`balance` >= 0 AND T0.`net_total` >= T0.`cash_paid`+T0.`card_paid`) OR T0.`cash_paid`+T0.`card_paid`=0 OR net_total=0")
+	sql := fmt.Sprintf("SELECT T0.* FROM `bills` T0 WHERE (T0.`closed`!=0) AND (T0.`balance` >= 0 AND T0.`net_total` > T0.`cash_paid`+T0.`card_paid`) OR T0.`cash_paid`+T0.`card_paid`=0 OR net_total=0")
 	//clear := fmt.Sprintf("update");
 
 	update := fmt.Sprintf("UPDATE " +
@@ -98,7 +100,10 @@ func GetPayableBills() (bills []Bills, err error) {
 		"b.balance=(bill_total.total-bill_total.discount)-(b.card_paid+b.cash_paid)	 " +
 		"WHERE " +
 		"b.id=bill_total.bill_id and (b.card_paid+b.cash_paid <= b.net_total or b.net_total<0)")
+	closebills := fmt.Sprintf("UPDATE bills b set b.closed=1 where `net_total` <= `cash_paid`+`card_paid` AND `net_total`>0")
+
 	_, err = o.Raw(update).Exec()
+	_, err = o.Raw(closebills).Exec()
 	_, err = o.Raw(sql).QueryRows(&bills)
 	if err == nil {
 		return bills, err

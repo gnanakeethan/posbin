@@ -67,12 +67,6 @@ func init() {
 			),
 		),
 
-		beego.NSNamespace("/product_product",
-			beego.NSInclude(
-				&controllers.ProductProductController{},
-			),
-		),
-
 		beego.NSNamespace("/products",
 			beego.NSInclude(
 				&controllers.ProductsController{},

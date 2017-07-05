@@ -24,8 +24,8 @@ func (c *TokenController) Prepare() {
 		token := c.Ctx.Request.Header.Get("Authorization")
 		if token != "" {
 			auth.ValidateToken(requests.AuthenticationRefreshRequest{Token: token}, &response)
+			logs.Info("assss")
 		}
-		logs.Info(token)
 
 		if response.Success {
 		} else {

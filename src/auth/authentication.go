@@ -13,7 +13,7 @@ import (
 )
 
 var user models.Users
-var validTime int64 = 62
+var validTime int64 = 1200
 
 //Authenticate function defines authentication for user;
 func Authenticate(v requests.AuthenticationRequest, response *responses.Authentication) {
