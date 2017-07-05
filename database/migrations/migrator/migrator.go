@@ -39,10 +39,17 @@ type Column struct {
 	Default  string
 	Unsign   string
 	DataType string
+	remove   bool
+	Modify   bool
 }
 type RenameColumn struct {
-	OldName string
-	NewName string
+	OldName     string
+	OldNull     string
+	OldDefault  string
+	OldUnsign   string
+	OldDataType string
+	NewName     string
+	Column
 }
 
 /*
@@ -51,40 +58,115 @@ type RenameColumn struct {
 
 
 Column Methods start
- */
-//func (c *Column) SetName(name string) *Column {
-//	c.Name = name
-//	return c
-//}
-//func (c *Column) SetAuto(inc bool) *Column {
-//	if inc {
-//		c.Inc = "auto_increment"
-//	}
-//	return c
-//}
-//func (c *Column) SetNullable(null bool) *Column {
-//	if null {
-//		c.Null = "NULLABLE"
-//
-//	} else {
-//		c.Null = "NOT NULL"
-//	}
-//	return c
-//}
-//func (c *Column) SetDefault(def string) *Column {
-//	c.Default = def
-//	return c
-//}
-//func (c *Column) SetUnsigned(unsign bool) *Column {
-//	if unsign {
-//		c.Unsign = "UNSIGNED"
-//	}
-//	return c
-//}
-//func (c *Column) SetDataType(dataType string) *Column {
-//	c.DataType = dataType
-//	return c
-//}
+*/
+
+func (m *Migrate) NewCol(name string) *Column {
+	col := &Column{Name: name}
+	m.AddColumns(col)
+	return col
+}
+func (m *Migrate) PriCol(name string) *Column {
+	col := &Column{Name: name}
+	m.AddColumns(col)
+	m.AddPrimary(col)
+	return col
+}
+func (m *Migrate) UniCol(uni, name string) *Column {
+	col := &Column{Name: name}
+	m.AddColumns(col)
+
+	uniqueOriginal := &Unique{}
+
+	for _, unique := range m.Uniques {
+		if unique.Definition == uni {
+			unique.AddColumns(col)
+			uniqueOriginal = unique
+		}
+	}
+	if uniqueOriginal.Definition == "" {
+		unique := &Unique{Definition: uni}
+		unique.AddColumns(col)
+		m.AddUnique(unique)
+	}
+
+	return col
+}
+
+func (c *Column) Remove() {
+	c.remove = true
+}
+
+func (c *Column) SetAuto(inc bool) *Column {
+	if inc {
+		c.Inc = "auto_increment"
+	}
+	return c
+}
+func (c *Column) SetNullable(null bool) *Column {
+	if null {
+		c.Null = "DEFAULT NULL"
+
+	} else {
+		c.Null = "NOT NULL"
+	}
+	return c
+}
+func (c *Column) SetDefault(def string) *Column {
+	c.Default = def
+	return c
+}
+func (c *Column) SetUnsigned(unsign bool) *Column {
+	if unsign {
+		c.Unsign = "UNSIGNED"
+	}
+	return c
+}
+func (c *Column) SetDataType(dataType string) *Column {
+	c.DataType = dataType
+	return c
+}
+
+func (c *RenameColumn) SetOldNullable(null bool) *RenameColumn {
+	if null {
+		c.OldNull = "DEFAULT NULL"
+
+	} else {
+		c.OldNull = "NOT NULL"
+	}
+	return c
+}
+func (c *RenameColumn) SetOldDefault(def string) *RenameColumn {
+	c.OldDefault = def
+	return c
+}
+func (c *RenameColumn) SetOldUnsigned(unsign bool) *RenameColumn {
+	if unsign {
+		c.OldUnsign = "UNSIGNED"
+	}
+	return c
+}
+
+func (c *RenameColumn) SetOldDataType(dataType string) *RenameColumn {
+	c.OldDataType = dataType
+	return c
+}
+
+func (c *Column) SetPrimary(m *Migrate) *Column {
+	m.Primary = append(m.Primary, c)
+	return c
+}
+
+func (m *Migrate) NewUnique(name string) (unique *Unique) {
+	unique = &Unique{Definition: name}
+	return
+}
+func (unique *Unique) AddColumns(columns ...*Column) *Unique {
+	for _, column := range columns {
+		unique.Columns = append(unique.Columns, column)
+	}
+	return unique
+}
+
 /*
 
 
@@ -102,7 +184,7 @@ Colum Methods end
 
 
 
- */
+*/
 
 /*
 
@@ -113,18 +195,7 @@ Colum Methods end
 
 
 */
-func (unique *Unique) AddColumns(columns ...*Column) *Unique {
-	for _, column := range columns {
-		unique.Columns = append(unique.Columns, column)
-	}
-	return unique
-}
 
-func NewMigrate() (migration Migrate) {
-	migration = Migrate{}
-	return migration
-
-}
 func (migration *Migrate) AddColumns(columns ...*Column) *Migrate {
 	for _, column := range columns {
 		migration.Columns = append(migration.Columns, column)
@@ -150,9 +221,10 @@ func (migration *Migrate) AddIndex(index *Index) *Migrate {
 	return migration
 }
 
-func (migration *Migrate) RenameColumn(column *RenameColumn) *Migrate {
-	migration.Renames = append(migration.Renames, column)
-	return migration
+func (migration *Migrate) RenameColumn(from, to string) *RenameColumn {
+	rename := &RenameColumn{OldName: from, NewName: to}
+	migration.Renames = append(migration.Renames, rename)
+	return rename
 }
 
 func (migration *Migrate) GetSQL() (sql string) {
@@ -162,7 +234,7 @@ func (migration *Migrate) GetSQL() (sql string) {
 		{
 			sql += fmt.Sprintf("CREATE TABLE `%s` (", migration.TableName)
 			for index, column := range migration.Columns {
-				sql += fmt.Sprintf("\n `%s` %s %s %s %s", column.Name, column.DataType,column.Unsign,column.Null,column.Inc)
+				sql += fmt.Sprintf("\n `%s` %s %s %s %s %s", column.Name, column.DataType, column.Unsign, column.Null, column.Inc, column.Default)
 				if len(migration.Columns) > index+1 {
 					sql += ","
 				}
@@ -197,8 +269,53 @@ func (migration *Migrate) GetSQL() (sql string) {
 		}
 	case "alter":
 		{
-			sql += fmt.Sprintf("ALTER TABLE `%s` (", migration.TableName)
+			sql += fmt.Sprintf("ALTER TABLE `%s` ", migration.TableName)
+			for index, column := range migration.Columns {
+				sql += fmt.Sprintf("\n ADD `%s` %s %s %s %s %s", column.Name, column.DataType, column.Unsign, column.Null, column.Inc, column.Default)
+				if len(migration.Columns) > index+1 {
+					sql += ","
+				}
+			}
+			for index, column := range migration.Renames {
+				sql += fmt.Sprintf(",\n CHANGE COLUMN `%s` `%s` %s %s %s %s %s", column.OldName, column.NewName, column.DataType, column.Unsign, column.Null, column.Inc, column.Default)
+				if len(migration.Renames) > index+1 {
+					sql += ","
+				}
+			}
+
+			sql += ";"
+
 			break
+		}
+	case "reverse":
+		{
+
+			sql += fmt.Sprintf("ALTER TABLE `%s`", migration.TableName)
+			for index, column := range migration.Columns {
+				sql += fmt.Sprintf("\n DROP COLUMN `%s`", column.Name)
+				if len(migration.Columns) > index+1 {
+					sql += ","
+				}
+			}
+
+			if len(migration.Primary) > 0 {
+				sql += fmt.Sprintf(",\n DROP PRIMARY KEY")
+			}
+
+			for index, unique := range migration.Uniques {
+				sql += fmt.Sprintf(",\n DROP KEY `%s`", unique.Definition)
+				if len(migration.Uniques) > index+1 {
+					sql += ","
+				}
+
+			}
+			for index, column := range migration.Renames {
+				sql += fmt.Sprintf(",\n CHANGE COLUMN `%s` `%s` %s %s %s %s", column.NewName, column.OldName, column.OldDataType, column.OldUnsign, column.OldNull, column.OldDefault)
+				if len(migration.Renames) > index+1 {
+					sql += ","
+				}
+			}
+			sql += ";"
 		}
 	case "delete":
 		{

@@ -19,7 +19,15 @@ func init() {
 	m := &Stores_20170704_165247{}
 	m.Created = "20170704_165247"
 	migration.Register("Stores_20170704_165247", m)
-	m.getMigration()
+	m.TableName = "stores"
+	m.Engine = "InnoDB"
+	m.Charset = "utf8"
+	m.PriCol("id").SetAuto(true).SetNullable(false).SetDataType("INT(10)").SetUnsigned(true)
+	m.PriCol("sec_id").SetNullable(false).SetDataType("INT(10)").SetUnsigned(true)
+	m.UniCol("name_unique", "name").SetDataType("VARCHAR(255)").SetNullable(true)
+	m.UniCol("name_unique", "cals").SetDataType("VARCHAR(255)").SetNullable(true)
+	m.NewCol("address").SetDataType("text").SetNullable(true)
+	m.NewCol("contact").SetDataType("tinytext").SetNullable(true)
 }
 
 // Run the migrations
@@ -31,23 +39,6 @@ func (m *Stores_20170704_165247) Up() {
 	m.SQL(sql)
 }
 
-func (m *Stores_20170704_165247) getMigration() {
-	m.TableName = "stores"
-	m.Engine = "InnoDB"
-	m.Charset = "utf8"
-
-	id := &migrator.Column{Name:"id",Unsign:"UNSIGNED",Inc:"AUTO_INCREMENT",Null:"NOT NULL",DataType:"INT(10)"}
-	name := &migrator.Column{Name: "name", DataType: "varchar(255)"}
-	address := &migrator.Column{Name: "address", DataType: "text"}
-	contact := &migrator.Column{Name: "contact_no", DataType: "tinytext"}
-
-	unique := &migrator.Unique{Definition: "name_index"}
-	unique.AddColumns(name)
-
-	m.AddColumns(id, name, address, contact).AddPrimary(id).AddUnique(unique)
-
-}
-
 // Reverse the migrations
 func (m *Stores_20170704_165247) Down() {
 	// use m.SQL("DROP TABLE ...") to reverse schema update
@@ -55,5 +46,4 @@ func (m *Stores_20170704_165247) Down() {
 	sql := m.GetSQL()
 	beego.BeeLogger.Info(fmt.Sprint(sql))
 	m.SQL(sql)
-
 }
