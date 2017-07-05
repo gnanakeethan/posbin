@@ -1,6 +1,10 @@
 package migrator
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/astaxie/beego"
+)
 
 type Migrate struct {
 	TableName      string
@@ -271,7 +275,13 @@ func (migration *Migrate) GetSQL() (sql string) {
 		{
 			sql += fmt.Sprintf("ALTER TABLE `%s` ", migration.TableName)
 			for index, column := range migration.Columns {
-				sql += fmt.Sprintf("\n ADD `%s` %s %s %s %s %s", column.Name, column.DataType, column.Unsign, column.Null, column.Inc, column.Default)
+				if !column.remove {
+					beego.BeeLogger.Info("col")
+					sql += fmt.Sprintf("\n ADD `%s` %s %s %s %s %s", column.Name, column.DataType, column.Unsign, column.Null, column.Inc, column.Default)
+				} else {
+					sql += fmt.Sprintf("\n DROP COLUMN `%s`", column.Name)
+				}
+
 				if len(migration.Columns) > index+1 {
 					sql += ","
 				}
@@ -292,7 +302,11 @@ func (migration *Migrate) GetSQL() (sql string) {
 
 			sql += fmt.Sprintf("ALTER TABLE `%s`", migration.TableName)
 			for index, column := range migration.Columns {
-				sql += fmt.Sprintf("\n DROP COLUMN `%s`", column.Name)
+				if column.remove {
+					sql += fmt.Sprintf("\n ADD `%s` %s %s %s %s %s", column.Name, column.DataType, column.Unsign, column.Null, column.Inc, column.Default)
+				} else {
+					sql += fmt.Sprintf("\n DROP COLUMN `%s`", column.Name)
+				}
 				if len(migration.Columns) > index+1 {
 					sql += ","
 				}
