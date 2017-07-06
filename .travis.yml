@@ -1,7 +1,26 @@
 language: go
 
 go:
-  - 1.x
-  - 1.6
-  - 1.7.x
+  - 1.7
+  - 1.8
   - master
+
+services:
+  - redis-server
+  - mysql
+  - postgresql
+  - memcached
+
+
+
+env:
+  - ORM_DRIVER=mysql    ORM_SOURCE="root:@/orm_test?charset=utf8"
+
+install:
+  - go get github.com/astaxie/beego
+  - go get github.com/beego/bee
+
+before_script:
+  - sh -c "if [ '$ORM_DRIVER' = 'mysql' ]; then mysql -u root -e 'create database orm_test;'; fi"
+script:
+  - go run main.go
