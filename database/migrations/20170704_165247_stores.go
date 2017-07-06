@@ -1,14 +1,10 @@
 package main
 
-import (
-	"github.com/astaxie/beego/migration"
-	"github.com/gnanakeethan/posbin/database/migrations/migrator"
-)
+import "github.com/astaxie/beego/migration"
 
 // DO NOT MODIFY
 type Stores_20170704_165247 struct {
 	migration.Migration
-	migrator.Migrate
 }
 
 // DO NOT MODIFY
@@ -27,14 +23,10 @@ func init() {
 
 // Run the migrations
 func (m *Stores_20170704_165247) Up() {
-	m.ModifyType = "create"
-	sql := m.GetSQL()
-	m.SQL(sql)
+	m.Migrate("create")
 }
 
 // Reverse the migrations
 func (m *Stores_20170704_165247) Down() {
-	m.ModifyType = "delete"
-	sql := m.GetSQL()
-	m.SQL(sql)
+	m.Migrate("delete")
 }
