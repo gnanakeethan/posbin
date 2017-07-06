@@ -9,7 +9,6 @@ import (
 	"github.com/gnanakeethan/posbin/models"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
 )
 
 // oprations for InventoryScale
@@ -137,9 +136,7 @@ func (c *InventoryScaleController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v := models.InventoryScale{Id: id}
-	req := c.Ctx.Input.RequestBody
-	logs.Info(req)
-	if err := json.Unmarshal(req, &v); err == nil {
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if err := models.UpdateInventoryScaleById(&v); err == nil {
 			c.Data["json"] = "OK"
 		} else {
