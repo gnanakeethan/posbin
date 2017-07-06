@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
@@ -13,8 +14,8 @@ type InventoryScale struct {
 	Id          int          `orm:"column(id);auto"`
 	InventoryId *Inventories `orm:"column(inventory_id);rel(fk)"`
 	ScaleId     *Scales      `orm:"column(scale_id);rel(fk)"`
-	Units       float64      `orm:"column(units)"`
-	Price       float64      `orm:"column(price)"`
+	Units       json.Number  `orm:"column(units)"`
+	Price       json.Number  `orm:"column(price)"`
 }
 
 func (t *InventoryScale) TableName() string {
