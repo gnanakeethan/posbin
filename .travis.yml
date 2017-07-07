@@ -12,7 +12,7 @@ before_install:
   - go get github.com/astaxie/beego
   - go get github.com/beego/bee
   - go get golang.org/x/crypto/bcrypt
-  - go get golang.org/x/
+  - go get golang.org/x/net/html
   - curl https://glide.sh/get | sh
 
 install:
