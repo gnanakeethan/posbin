@@ -152,8 +152,5 @@ func main() {
 	beego.BConfig.WebConfig.StaticDir["/bower_components"] = gC("publicdir") + "/bower_components"
 	beego.BConfig.WebConfig.StaticDir["/src"] = gC("publicdir") + "/src"
 
-	beego.InsertFilter("/index.html", beego.BeforeStatic, preload)
-	beego.InsertFilter("/", beego.BeforeStatic, preload)
-
 	beego.Run()
 }
