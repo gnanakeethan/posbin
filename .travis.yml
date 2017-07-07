@@ -17,8 +17,7 @@ env:
   - ORM_DRIVER=mysql    ORM_SOURCE="root:@/orm_test?charset=utf8"
 
 before_install:
-  - sudo add-apt-repository ppa:masterminds/glide -y && sudo apt-get update -y
-  - sudo apt-get install glide -y
+  - curl https://glide.sh/get | sh
   - go get github.com/astaxie/beego
   - go get github.com/beego/bee
 
