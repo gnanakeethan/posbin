@@ -21,6 +21,9 @@ before_install:
   - go get github.com/beego/bee
   - curl https://glide.sh/get | sh
 
+install:
+  - glide install
+
 before_script:
   - sh -c "if [ '$ORM_DRIVER' = 'mysql' ]; then mysql -u root -e 'create database orm_test;'; fi"
 script:
