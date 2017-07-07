@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
 	"github.com/gnanakeethan/posbin/requests"
 	"github.com/gnanakeethan/posbin/responses"
 	"github.com/gnanakeethan/posbin/src/auth"
@@ -24,7 +23,7 @@ func (c *TokenController) Prepare() {
 		token := c.Ctx.Request.Header.Get("Authorization")
 		if token != "" {
 			auth.ValidateToken(requests.AuthenticationRefreshRequest{Token: token}, &response)
-			logs.Info("assss")
+
 		}
 
 		if response.Success {
