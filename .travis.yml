@@ -3,7 +3,7 @@ language: go
 go:
   - 1.7
   - 1.8
-  - master
+  - 1.6
 
 env:
   - ORM_DRIVER=mysql    ORM_SOURCE="root:@/orm_test?charset=utf8"
