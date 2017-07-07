@@ -2,8 +2,8 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -36,29 +36,37 @@ func gC(conf string) string {
 }
 
 // Helper function to pull the href attribute from a Token
-func getHref(t html.Token) (ok bool, href string) {
+func getHref(t html.Token) (bool, string, string) {
+	href := ""
+	impt := ""
+	ok := false
 	// Iterate over all of the Token's attributes until we find an "href"
 	for _, a := range t.Attr {
 		if a.Key == "href" {
 			href = a.Val
+		}
+		if a.Key == "rel" {
+			impt = a.Val
 			ok = true
 		}
 	}
 
 	// "bare" return will return the variables (ok, href) as defined in
 	// the function definition
-	return
+	return ok, href, impt
 }
+func recurvPreload(path string, paths map[string]string, level *int) {
 
-var preload = func(ctx *context.Context) {
-	path := gC("publicdir") + ctx.Request.URL.Path
+	if *level > 10 {
+		return
+	}
 	f, _ := os.Open(path)
 	replace, _ := regexp.Compile("([a-z-]+).html$")
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(dir)
+
 	rootpath := replace.ReplaceAll([]byte(path), []byte(""))
 	r4 := bufio.NewReader(f)
 
@@ -75,12 +83,14 @@ var preload = func(ctx *context.Context) {
 
 			// Check if the token is an <a> tag
 			isAnchor := t.Data == "link"
+			// isImport := t.Attr["rel"] == "import"
+
 			if !isAnchor {
 				continue
 			}
 
 			// Extract the href value, if there is one
-			ok, urlt := getHref(t)
+			ok, urlt, _ := getHref(t)
 			if !ok {
 				continue
 			}
@@ -88,9 +98,32 @@ var preload = func(ctx *context.Context) {
 			urld, _ := url.Parse(string(rootpath) + string(urlt))
 
 			pushpath, _ := filepath.Abs(urld.EscapedPath())
-			pushpath = strings.Replace(pushpath, dir+"/"+gC("publicdir"), "", -1)
-			// ctx.Output.Context.ResponseWriter.Header().Add("Link", fmt.Sprintf(" <%s>; rel=preload", pushpath))
+			pushpathd := strings.Replace(pushpath, dir+"/"+gC("publicdir"), "", -1)
+
+			paths[pushpathd] = pushpath
+			recurvPreload(pushpath, paths, level)
+			*level++
+
 		}
+	}
+}
+
+var preload = func(ctx *context.Context) {
+	level := 1
+	path := gC("publicdir") + "/index.html"
+	paths := make(map[string]string)
+	recurvPreload(path, paths, &level)
+
+	w := ctx.Output.Context.ResponseWriter.ResponseWriter
+	for key, _ := range paths {
+
+		if pusher, ok := w.(http.Pusher); ok {
+			// Push is supported.
+			if err := pusher.Push(key, nil); err != nil {
+				log.Printf("Failed to push: %v", err)
+			}
+		}
+
 	}
 }
 
@@ -119,7 +152,8 @@ func main() {
 	beego.BConfig.WebConfig.StaticDir["/bower_components"] = gC("publicdir") + "/bower_components"
 	beego.BConfig.WebConfig.StaticDir["/src"] = gC("publicdir") + "/src"
 
-	beego.InsertFilter("/*", beego.BeforeStatic, preload)
+	beego.InsertFilter("/index.html", beego.BeforeStatic, preload)
+	beego.InsertFilter("/", beego.BeforeStatic, preload)
 
 	beego.Run()
 }
