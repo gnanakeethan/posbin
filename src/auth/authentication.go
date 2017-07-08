@@ -93,7 +93,9 @@ func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.A
 		vp := &models.Users{Id: claims.UserId}
 		if err := o.Read(vp); err == nil {
 			claims := AuthenticationClaim{
-				UserId: vp.Id,
+				UserId:     vp.Id,
+				StoreId:    0,
+				TerminalId: 0,
 				StandardClaims: jwt.StandardClaims{
 					ExpiresAt: time.Now().Unix() + validTime,
 					NotBefore: time.Now().Unix(),
