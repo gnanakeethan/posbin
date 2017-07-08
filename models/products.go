@@ -155,6 +155,7 @@ func GetBillProducts(query map[string]string, limit int64) (ml []interface{}, er
 		_, err = o.Raw("select * from products where name like ? or product_code like ?  limit ?", query["Name"], query["Name"], limit).QueryRows(&products)
 	}
 	for _, v := range products {
+		o.LoadRelated(&v, "Inventory")
 		ml = append(ml, v)
 	}
 	return ml, nil
