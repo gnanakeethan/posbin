@@ -3,11 +3,13 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 	"strings"
 
+	"github.com/gnanakeethan/posbin/models"
+
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 )
 
 // oprations for Inventories
@@ -136,6 +138,7 @@ func (c *InventoriesController) Put() {
 	id, _ := strconv.Atoi(idStr)
 	v := models.Inventories{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		logs.Info(v.Expiry)
 		if err := models.UpdateInventoriesById(&v); err == nil {
 			c.Data["json"] = "OK"
 		} else {

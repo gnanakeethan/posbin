@@ -154,7 +154,7 @@ func UpdateSalesById(m *Sales) (err error) {
 		if m.UnitPrice <= 0 {
 			m.UnitPrice = v.UnitPrice
 		}
-		sql := "select p.id,p.name,i.id,purchases.average_cost,ins.price,ins.units from inventories i inner join products p on i.product_id= p.id inner join purchases on purchases.inventory_id = i.id inner join inventory_scale ins on ins.inventory_id=i.id where i.id=? order by units desc"
+		sql := "select p.id,p.name,i.id,purchases.average_cost,ins.price,ins.units from inventories i inner join products p on i.product_id= p.id outer join purchases on purchases.inventory_id = i.id inner join inventory_scale ins on ins.inventory_id=i.id where i.id=? order by units desc"
 
 		var list []orm.Params
 		o.Raw(sql, v.InventoryId.Id).Values(&list)

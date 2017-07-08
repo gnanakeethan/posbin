@@ -14,7 +14,7 @@ import (
 type Inventories struct {
 	Id             int               `orm:"column(id);auto"`
 	BatchNo        string            `orm:"column(batch_no);size(255)"`
-	Expiry         time.Time         `orm:"column(expiry);type(date);null"`
+	Expiry         time.Time         `orm:"column(expiry);type(date);null" json:"Expiry,string"`
 	ProductId      *Products         `orm:"column(product_id);rel(fk)"`
 	InventoryScale []*InventoryScale `orm:"reverse(many)"`
 	Purchases      []*Purchases      `orm:"reverse(many)"`
