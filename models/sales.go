@@ -11,6 +11,7 @@ import (
 
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	"github.com/imdario/mergo"
 )
 
 type Sales struct {
@@ -145,7 +146,7 @@ func UpdateSalesById(m *Sales) (err error) {
 	if err = o.Read(&v); err == nil {
 		var num int64
 		logs.Error(v)
-		// mergo.Merge(&v)
+		mergo.Merge(&v, &m)
 		m.InventoryId = v.InventoryId
 		m.BillId = v.BillId
 		if m.Units == 0 {
