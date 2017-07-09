@@ -13,11 +13,11 @@ before_install:
   - go get golang.org/x/crypto/bcrypt
   - curl https://glide.sh/get | sh
 
+before_install:
+  - sh -c "if [ '$ORM_DRIVER' = 'mysql' ]; then mysql -u root -e 'create database posres;'; fi"
 install:
   - glide install
   - bee migrate refresh -driver=mysql -conn="root:@tcp(127.0.0.1:3306)/posres"
 
-before_script:
-  - sh -c "if [ '$ORM_DRIVER' = 'mysql' ]; then mysql -u root -e 'create database posres;'; fi"
 script:
   - go build main.go
