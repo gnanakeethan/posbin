@@ -10,10 +10,11 @@ before_install:
   - go get github.com/astaxie/beego
   - go get github.com/beego/bee
   - go get github.com/imdario/mergo
+  - go get github.com/lib/pq
   - go get golang.org/x/crypto/bcrypt
   - curl https://glide.sh/get | sh
   - sh -c "if [ '$ORM_DRIVER' = 'mysql' ]; then mysql -u root -e 'create database posres;'; fi"
-  
+
 install:
   - glide install
   - bee migrate refresh -driver=mysql -conn="root:@tcp(127.0.0.1:3306)/posres"
