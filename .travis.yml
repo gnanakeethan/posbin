@@ -17,7 +17,7 @@ before_install:
 
 install:
   - glide install
-  - bee migrate refresh -driver=mysql -conn="root:@tcp(127.0.0.1:3306)/posres"
+  - bee migrate -driver=mysql -conn="root:@tcp(127.0.0.1:3306)/posres"
 
 script:
   - go build main.go
