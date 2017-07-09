@@ -18,8 +18,8 @@ type Discounts struct {
 	Type      string    `orm:"column(type)"`
 	Value     float64   `orm:"column(value)"`
 	StoreId   *Stores   `orm:"column(store_id);rel(fk)"`
-	CreatedAt time.Time `orm:"column(created_at);type(timestamp);null"`
-	UpdatedAt time.Time `orm:"column(updated_at);type(timestamp);null"`
+	CreatedAt time.Time `orm:"auto_now_add;column(created_at);type(datetime);null"`
+	UpdatedAt time.Time `orm:"auto_now;column(updated_at);type(datetime);null"`
 }
 
 func (t *Discounts) TableName() string {

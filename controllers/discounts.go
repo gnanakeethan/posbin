@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 	"strings"
+
+	"github.com/gnanakeethan/posbin/models"
 
 	"github.com/astaxie/beego"
 )
@@ -137,7 +138,7 @@ func (c *DiscountsController) Put() {
 	v := models.Discounts{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if err := models.UpdateDiscountsById(&v); err == nil {
-			c.Data["json"] = "OK"
+			c.Data["json"] = v
 		} else {
 			c.Data["json"] = err.Error()
 		}

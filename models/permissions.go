@@ -15,8 +15,8 @@ type Permissions struct {
 	Name        string    `orm:"column(name);size(255)"`
 	DisplayName string    `orm:"column(display_name);size(255);null"`
 	Description string    `orm:"column(description);size(255);null"`
-	CreatedAt   time.Time `orm:"column(created_at);type(timestamp);null"`
-	UpdatedAt   time.Time `orm:"column(updated_at);type(timestamp);null"`
+	CreatedAt   time.Time `orm:"auto_now_add;column(created_at);type(datetime);null"`
+	UpdatedAt   time.Time `orm:"auto_now;column(updated_at);type(datetime);null"`
 	Roles       []*Roles  `orm:"reverse(many)"`
 }
 
