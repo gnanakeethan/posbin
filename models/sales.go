@@ -185,12 +185,36 @@ func UpdateSalesById(m *Sales, reset bool) (err error) {
 
 				remUnits = remt
 			}
-			m.Amount = m.Total - m.Discount
-			if num, err = o.Update(m); err == nil {
-				fmt.Println("Number of records updated in database:", num)
-			}
+
 		}
 
+		sqlDiscounts := "select i.id,p.product_code,d.name,d.type,d.value from inventories i inner join products p on p.id=i.product_id inner join discountables ds on (ds.discountable_id=p.id and ds.discountable_type=\"Products\") or (ds.discountable_id=i.id and ds.discountable_type=\"Inventories\") inner join discounts d on d.id=ds.discount_id where d.from<=NOW() and d.to>=NOW() and i.id=?;"
+
+		var discounts []orm.Params
+		o.Raw(sqlDiscounts, v.InventoryId.Id).Values(&discounts)
+		if len(discounts) > 0 {
+			for _, el := range discounts {
+				switch el["type"] {
+				case "percentage":
+					{
+						disc, _ := strconv.ParseFloat(el["value"].(string), 32)
+						m.Discount += m.Total * disc / 100
+						break
+					}
+				case "value":
+					{
+						disc, _ := strconv.ParseFloat(el["value"].(string), 32)
+						m.Discount += disc
+						break
+					}
+				}
+			}
+
+		}
+		m.Amount = m.Total - m.Discount
+		if num, err = o.Update(m); err == nil {
+			fmt.Println("Number of records updated in database:", num)
+		}
 	}
 	return err
 }
