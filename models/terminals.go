@@ -8,11 +8,12 @@ import (
 	"time"
 
 	"github.com/astaxie/beego/orm"
+	"github.com/imdario/mergo"
 )
 
 type Terminals struct {
 	Id        int       `orm:"column(id);auto"`
-	UserId    *Users    `orm:"column(user_id);rel(fk)"`
+	UserId    *Users    `orm:"column(user_id);rel(one);"`
 	Machine   string    `orm:"column(machine);size(255)"`
 	Printer   string    `orm:"column(printer);size(255)"`
 	Balance   float64   `orm:"column(balance)"`
@@ -129,9 +130,15 @@ func UpdateTerminalsById(m *Terminals) (err error) {
 	v := Terminals{Id: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
+		sql := "update terminals set user_id null where user_id=?"
+		if v.UserId != nil {
+			o.Raw(sql, v.UserId.Id)
+		}
+		if err = mergo.Merge(m, &v); err == nil {
+			var num int64
+			if num, err = o.Update(m); err == nil {
+				fmt.Println("Number of records updated in database:", num)
+			}
 		}
 	}
 	return

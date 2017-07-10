@@ -5,7 +5,7 @@ import (
 
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gnanakeethan/posbin/models"
 	"github.com/gnanakeethan/posbin/requests"
 	"github.com/gnanakeethan/posbin/responses"
@@ -13,21 +13,33 @@ import (
 )
 
 var user models.Users
-var validTime int64 = 120000
+var validTime int64 = 120
 
 //Authenticate function defines authentication for user;
 func Authenticate(v requests.AuthenticationRequest, response *responses.Authentication) {
 	o := orm.NewOrm()
 	o.QueryTable(new(models.Users)).Filter("username", v.Username).One(&user)
+	o.LoadRelated(&user, "TerminalId")
+	var terminalId int = 0
+	if user.TerminalId != nil {
+		logs.Info(user.TerminalId)
+		terminalId = user.TerminalId.Id
+	}
+	//logs.Info(reflect.DeepEqual(user.TerminalId) == reflect.TypeOf(&models.Terminals{}))
+	//panic(user.TerminalId)
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(v.Password)); err == nil {
 		// Create the Claims
 		claims := AuthenticationClaim{
-			UserId: user.Id,
+			UserId:     user.Id,
+			StoreId:    1,
+			TerminalId: terminalId,
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: time.Now().Unix() + validTime,
 				NotBefore: time.Now().Unix(),
 			},
 		}
+		logs.Info(claims)
+
 		signingString := user.Username + user.Email
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 		if response.Token, err = token.SignedString([]byte(signingString)); err == nil {
@@ -91,11 +103,18 @@ func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.A
 		}(v)
 
 		vp := &models.Users{Id: claims.UserId}
+		var terminalId int = 0
+
 		if err := o.Read(vp); err == nil {
+			o.LoadRelated(&user, "TerminalId")
+			if user.TerminalId != nil {
+				logs.Info(user.TerminalId)
+				terminalId = user.TerminalId.Id
+			}
 			claims := AuthenticationClaim{
 				UserId:     vp.Id,
-				StoreId:    0,
-				TerminalId: 0,
+				StoreId:    1,
+				TerminalId: terminalId,
 				StandardClaims: jwt.StandardClaims{
 					ExpiresAt: time.Now().Unix() + validTime,
 					NotBefore: time.Now().Unix(),

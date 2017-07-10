@@ -3,11 +3,14 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 	"strings"
 
+	"github.com/gnanakeethan/posbin/models"
+
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
 )
 
 // oprations for Terminals
@@ -124,6 +127,30 @@ func (c *TerminalsController) GetAll() {
 	c.ServeJSON()
 }
 
+// GetEmpty defines
+// @Title GetEmpty
+// @Description get Terminals
+// @Success 200 {object} models.Terminals
+// @Failure 403
+// @router /empty [get]
+func (c *TerminalsController) GetEmpty() {
+	o := orm.NewOrm()
+	sqlDelete := "update terminals set user_id=null where user_id=?"
+	lgout := c.GetString("logout")
+	if lgg, err := strconv.ParseBool(lgout); lgg == true && err == nil {
+		logs.Info(lgout)
+		o.Raw(sqlDelete, lgout).Exec()
+	}
+	sql := "select * from terminals where user_id is null;"
+	var terminals []models.Terminals
+	if _, err := o.Raw(sql).QueryRows(&terminals); err == nil {
+		c.Data["json"] = terminals
+	} else {
+		c.Data["json"] = err.Error()
+	}
+	c.ServeJSON()
+}
+
 // @Title Update
 // @Description update the Terminals
 // @Param	id		path 	string	true		"The id you want to update"
@@ -137,7 +164,7 @@ func (c *TerminalsController) Put() {
 	v := models.Terminals{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if err := models.UpdateTerminalsById(&v); err == nil {
-			c.Data["json"] = "OK"
+			c.Data["json"] = v
 		} else {
 			c.Data["json"] = err.Error()
 		}
