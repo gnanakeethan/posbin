@@ -16,8 +16,8 @@ type Discountables struct {
 	DiscountId       *Discounts `orm:"column(discount_id);rel(fk)"`
 	DiscountableId   uint       `orm:"column(discountable_id);null"`
 	DiscountableType string     `orm:"column(discountable_type);size(255)"`
-	CreatedAt        time.Time  `orm:"column(created_at);type(timestamp);null"`
-	UpdatedAt        time.Time  `orm:"column(updated_at);type(timestamp);null"`
+	CreatedAt        time.Time  `orm:"auto_now_add;column(created_at);type(datetime);null"`
+	UpdatedAt        time.Time  `orm:"auto_now;column(updated_at);type(datetime);null"`
 }
 
 func (t *Discountables) TableName() string {
@@ -32,7 +32,7 @@ func init() {
 // last inserted Id on success.
 func AddDiscountables(m *Discountables) (id int64, err error) {
 	o := orm.NewOrm()
-	id, err = o.Insert(m)
+	_, id, err = o.ReadOrCreate(m, "DiscountId", "DiscountableType", "DiscountableId")
 	return
 }
 

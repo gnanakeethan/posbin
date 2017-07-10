@@ -11,7 +11,6 @@ import (
 
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/imdario/mergo"
 )
 
 type Sales struct {
@@ -42,7 +41,7 @@ func init() {
 // last inserted Id on success.
 func AddSales(m *Sales) (id int64, err error) {
 	o := orm.NewOrm()
-	id, err = o.Insert(m)
+	id, err = o.InsertOrUpdate(m)
 	return
 }
 
@@ -140,13 +139,13 @@ func GetAllSales(query map[string]string, fields []string, sortby []string, orde
 	return nil, err
 }
 
-func UpdateSalesById(m *Sales) (err error) {
+func UpdateSalesById(m *Sales, reset bool) (err error) {
 	o := orm.NewOrm()
 	v := Sales{Id: m.Id}
 	if err = o.Read(&v); err == nil {
 		var num int64
 		logs.Error(v)
-		mergo.Merge(&v, &m)
+		// mergo.Merge(&v, &m)
 		m.InventoryId = v.InventoryId
 		m.BillId = v.BillId
 		if m.Units == 0 {
@@ -167,7 +166,7 @@ func UpdateSalesById(m *Sales) (err error) {
 			m.Total = float64(pr) * float64(remUnits)
 			m.Cost = float64(av) * float64(remUnits)
 			prv, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
-			if m.UnitPrice > float64(prv) || m.UnitPrice == 0 {
+			if m.UnitPrice > float64(prv) || m.UnitPrice == 0 || reset {
 				m.UnitPrice = float64(prv)
 			}
 			m.Discount = 0

@@ -15,8 +15,8 @@ type Customers struct {
 	Name      string    `orm:"column(name);size(255)"`
 	ContactNo string    `orm:"column(contact_no);size(255)"`
 	Address   string    `orm:"column(address);size(255)"`
-	CreatedAt time.Time `orm:"column(created_at);type(timestamp);null"`
-	UpdatedAt time.Time `orm:"column(updated_at);type(timestamp);null"`
+	CreatedAt time.Time `orm:"auto_now_add;column(created_at);type(datetime);null"`
+	UpdatedAt time.Time `orm:"auto_now;column(updated_at);type(datetime);null"`
 }
 
 func (t *Customers) TableName() string {

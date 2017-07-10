@@ -34,7 +34,8 @@ func (c *SalesController) Post() {
 	var v models.Sales
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if _, err := models.AddSales(&v); err == nil {
-			models.UpdateSalesById(&v)
+			reset, _ := strconv.ParseBool(c.GetString("reset"))
+			models.UpdateSalesById(&v, reset)
 			c.Ctx.Output.SetStatus(201)
 			c.Data["json"] = v
 		} else {
@@ -138,7 +139,8 @@ func (c *SalesController) Put() {
 	id, _ := strconv.Atoi(idStr)
 	v := models.Sales{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if err := models.UpdateSalesById(&v); err == nil {
+		reset, _ := strconv.ParseBool(c.GetString("reset"))
+		if err := models.UpdateSalesById(&v, reset); err == nil {
 			c.Data["json"] = "OK"
 		} else {
 			c.Data["json"] = err.Error()

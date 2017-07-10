@@ -24,8 +24,8 @@ type Bills struct {
 	UserId     *Users     `orm:"column(user_id);rel(fk)" required:"true"`
 	TerminalId *Terminals `orm:"column(terminal_id);rel(fk)" required:"true"`
 	DeletedAt  time.Time  `orm:"column(deleted_at);type(timestamp);null"`
-	CreatedAt  time.Time  `orm:"auto_now_add;column(created_at);type(timestamp);null"`
-	UpdatedAt  time.Time  `orm:"auto_now;column(updated_at);type(timestamp);null"`
+	CreatedAt  time.Time  `orm:"auto_now_add;column(created_at);type(datetime);null"`
+	UpdatedAt  time.Time  `orm:"auto_now;column(updated_at);type(datetime);null"`
 	StoreId    *Stores    `orm:"column(store_id);rel(fk)"`
 	Closed     bool       `orm:"column(closed)"`
 }

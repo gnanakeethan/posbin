@@ -18,8 +18,8 @@ type Inventories struct {
 	ProductId      *Products         `orm:"column(product_id);rel(fk)"`
 	InventoryScale []*InventoryScale `orm:"reverse(many)"`
 	Purchases      []*Purchases      `orm:"reverse(many)"`
-	CreatedAt      time.Time         `orm:"column(created_at);type(timestamp);null"`
-	UpdatedAt      time.Time         `orm:"column(updated_at);type(timestamp);null"`
+	CreatedAt      time.Time         `orm:"auto_now_add;column(created_at);type(datetime);null"`
+	UpdatedAt      time.Time         `orm:"auto_now;column(updated_at);type(datetime);null"`
 	Service        int8              `orm:"column(service);null"`
 }
 

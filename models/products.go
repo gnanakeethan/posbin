@@ -50,6 +50,7 @@ func GetProductsById(id int) (v *Products, err error) {
 	o := orm.NewOrm()
 	v = &Products{Id: id}
 	if err = o.Read(v); err == nil {
+		o.LoadRelated(v, "Inventory")
 		return v, nil
 	}
 	return nil, err
