@@ -131,8 +131,9 @@ func UpdateTerminalsById(m *Terminals) (err error) {
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		sql := "update terminals set user_id null where user_id=?"
+
 		if v.UserId != nil {
-			o.Raw(sql, v.UserId.Id)
+			o.Raw(sql, v.UserId.Id).Exec()
 		}
 		if err = mergo.Merge(m, &v); err == nil {
 			var num int64

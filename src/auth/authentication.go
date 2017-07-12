@@ -13,26 +13,20 @@ import (
 )
 
 var user models.Users
-var validTime int64 = 120
+var validTime int64 = 1200
 
 //Authenticate function defines authentication for user;
 func Authenticate(v requests.AuthenticationRequest, response *responses.Authentication) {
 	o := orm.NewOrm()
 	o.QueryTable(new(models.Users)).Filter("username", v.Username).One(&user)
 	o.LoadRelated(&user, "TerminalId")
-	var terminalId int = 0
-	if user.TerminalId != nil {
-		logs.Info(user.TerminalId)
-		terminalId = user.TerminalId.Id
-	}
 	//logs.Info(reflect.DeepEqual(user.TerminalId) == reflect.TypeOf(&models.Terminals{}))
 	//panic(user.TerminalId)
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(v.Password)); err == nil {
 		// Create the Claims
 		claims := AuthenticationClaim{
-			UserId:     user.Id,
-			StoreId:    1,
-			TerminalId: terminalId,
+			UserId:  user.Id,
+			StoreId: 1,
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: time.Now().Unix() + validTime,
 				NotBefore: time.Now().Unix(),
@@ -45,9 +39,35 @@ func Authenticate(v requests.AuthenticationRequest, response *responses.Authenti
 		if response.Token, err = token.SignedString([]byte(signingString)); err == nil {
 			response.Success = true
 		}
+
+		go func() {
+			destroyToken := models.Tokens{Token: response.Token, ValidThru: time.Unix(claims.ExpiresAt, 200), Valid: true, User: &user}
+			o.ReadOrCreate(&destroyToken, "valid")
+
+			sqlnull := "update terminals set user_id null where user_id=?"
+			o.Raw(sqlnull, user.Id).Exec()
+		}()
 	}
 	return
 }
+func ClearTokens() {
+	o := orm.NewOrm()
+	sql := "delete from tokens where valid_thru < now()"
+	_, err := o.Raw(sql).Exec()
+	logs.Error(err)
+
+	sql = "update terminals set user_id null"
+	o.Raw(sql).Exec()
+}
+
+func InvalidateToken(v requests.AuthenticationRefreshRequest) {
+	o := orm.NewOrm()
+	destroyToken := &models.Tokens{}
+	o.QueryTable(new(models.Tokens)).Filter("Token", v.Token).One(destroyToken)
+	destroyToken.Valid = false
+	o.Update(destroyToken)
+}
+
 func ValidateToken(v requests.AuthenticationRefreshRequest, response *responses.Authentication) {
 	logs.Info(time.Local)
 	response.Token = ""
@@ -75,13 +95,14 @@ func permissionCheck(userID int) bool {
 }
 func extendedValidation(token string) bool {
 	o := orm.NewOrm()
-	if count, err := o.QueryTable(new(models.InvalidTokens)).Filter("token", token).Count(); err == nil {
+	if count, err := o.QueryTable(new(models.Tokens)).Filter("token", token).Filter("valid", false).Count(); err == nil {
 		if count > 0 {
 			return false
 		}
 	}
 	return true
 }
+
 func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.Authentication) {
 	response.Success = false
 	response.Token = ""
@@ -94,27 +115,16 @@ func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.A
 		}
 		return []byte(""), nil
 	})
+
 	if claims, ok := token.Claims.(*AuthenticationClaim); ok && token.Valid && extendedValidation(v.Token) {
 		o := orm.NewOrm()
-		go func(v requests.AuthenticationRefreshRequest) {
-			_, offset := time.Now().Zone()
-			destroyToken := models.InvalidTokens{Token: v.Token, ValidThru: time.Unix(claims.ExpiresAt+int64(offset), 200)}
-			o.Insert(&destroyToken)
-		}(v)
-
 		vp := &models.Users{Id: claims.UserId}
-		var terminalId int = 0
+		go InvalidateToken(v)
 
 		if err := o.Read(vp); err == nil {
-			o.LoadRelated(&user, "TerminalId")
-			if user.TerminalId != nil {
-				logs.Info(user.TerminalId)
-				terminalId = user.TerminalId.Id
-			}
 			claims := AuthenticationClaim{
-				UserId:     vp.Id,
-				StoreId:    1,
-				TerminalId: terminalId,
+				UserId:  vp.Id,
+				StoreId: 1,
 				StandardClaims: jwt.StandardClaims{
 					ExpiresAt: time.Now().Unix() + validTime,
 					NotBefore: time.Now().Unix(),
@@ -122,9 +132,14 @@ func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.A
 			}
 			signingString := vp.Username + vp.Email
 			token = jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
 			if response.Token, err = token.SignedString([]byte(signingString)); err == nil {
 				response.Success = true
 			}
+			go func() {
+				destroyToken := models.Tokens{Token: response.Token, ValidThru: time.Unix(claims.ExpiresAt, 200), Valid: true, User: vp}
+				o.Insert(&destroyToken)
+			}()
 		}
 
 	}

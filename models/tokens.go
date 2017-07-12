@@ -10,45 +10,47 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-type InvalidTokens struct {
+type Tokens struct {
 	Id        int       `orm:"column(id);auto"`
 	Token     string    `orm:"column(key);size(255)"`
+	User      *Users    `orm:"column(user_id);rel(one)"`
+	Valid     bool      `orm:"column(valid)"`
 	ValidThru time.Time `orm:"column(valid_thru);type(timestamp);null"`
 }
 
-func (t *InvalidTokens) TableName() string {
-	return "invalid_tokens"
+func (t *Tokens) TableName() string {
+	return "tokens"
 }
 
 func init() {
-	orm.RegisterModel(new(InvalidTokens))
+	orm.RegisterModel(new(Tokens))
 }
 
-// AddInvalidTokens insert a new InvalidTokens into database and returns
+// AddInvalidTokens insert a new Tokens into database and returns
 // last inserted Id on success.
-func AddInvalidTokens(m *InvalidTokens) (id int64, err error) {
+func AddInvalidTokens(m *Tokens) (id int64, err error) {
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
 }
 
-// GetInvalidTokensById retrieves InvalidTokens by Id. Returns error if
+// GetInvalidTokensById retrieves Tokens by Id. Returns error if
 // Id doesn't exist
-func GetInvalidTokensById(id int) (v *InvalidTokens, err error) {
+func GetInvalidTokensById(id int) (v *Tokens, err error) {
 	o := orm.NewOrm()
-	v = &InvalidTokens{Id: id}
+	v = &Tokens{Id: id}
 	if err = o.Read(v); err == nil {
 		return v, nil
 	}
 	return nil, err
 }
 
-// GetAllInvalidTokens retrieves all InvalidTokens matches certain condition. Returns empty list if
+// GetAllInvalidTokens retrieves all Tokens matches certain condition. Returns empty list if
 // no records exist
 func GetAllInvalidTokens(query map[string]string, fields []string, sortby []string, order []string,
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(InvalidTokens))
+	qs := o.QueryTable(new(Tokens))
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -94,7 +96,7 @@ func GetAllInvalidTokens(query map[string]string, fields []string, sortby []stri
 		}
 	}
 
-	var l []InvalidTokens
+	var l []Tokens
 	qs = qs.OrderBy(sortFields...)
 	if _, err := qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
@@ -117,11 +119,11 @@ func GetAllInvalidTokens(query map[string]string, fields []string, sortby []stri
 	return nil, err
 }
 
-// UpdateInvalidTokens updates InvalidTokens by Id and returns error if
+// UpdateInvalidTokens updates Tokens by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateInvalidTokensById(m *InvalidTokens) (err error) {
+func UpdateInvalidTokensById(m *Tokens) (err error) {
 	o := orm.NewOrm()
-	v := InvalidTokens{Id: m.Id}
+	v := Tokens{Id: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
@@ -132,15 +134,15 @@ func UpdateInvalidTokensById(m *InvalidTokens) (err error) {
 	return
 }
 
-// DeleteInvalidTokens deletes InvalidTokens by Id and returns error if
+// DeleteInvalidTokens deletes Tokens by Id and returns error if
 // the record to be deleted doesn't exist
 func DeleteInvalidTokens(id int) (err error) {
 	o := orm.NewOrm()
-	v := InvalidTokens{Id: id}
+	v := Tokens{Id: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Delete(&InvalidTokens{Id: id}); err == nil {
+		if num, err = o.Delete(&Tokens{Id: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
 	}
