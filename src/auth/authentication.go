@@ -25,8 +25,7 @@ func Authenticate(v requests.AuthenticationRequest, response *responses.Authenti
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(v.Password)); err == nil {
 		// Create the Claims
 		claims := AuthenticationClaim{
-			UserId:  user.Id,
-			StoreId: 1,
+			UserId: user.Id,
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: time.Now().Unix() + validTime,
 				NotBefore: time.Now().Unix(),
@@ -123,8 +122,7 @@ func RefreshToken(v requests.AuthenticationRefreshRequest, response *responses.A
 
 		if err := o.Read(vp); err == nil {
 			claims := AuthenticationClaim{
-				UserId:  vp.Id,
-				StoreId: 1,
+				UserId: vp.Id,
 				StandardClaims: jwt.StandardClaims{
 					ExpiresAt: time.Now().Unix() + validTime,
 					NotBefore: time.Now().Unix(),
