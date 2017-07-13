@@ -15,12 +15,13 @@ type Users struct {
 	Id            int        `orm:"column(id);auto"`
 	Username      string     `orm:"column(username);size(255)"`
 	Email         string     `orm:"column(email);size(255)"`
-	Password      string     `orm:"column(password);size(255)"`
-	RememberToken string     `orm:"column(remember_token);size(100);null"`
-	CreatedAt     time.Time  `orm:"column(created_at);type(timestamp);null"`
-	UpdatedAt     time.Time  `orm:"column(updated_at);type(timestamp);null"`
+	Password      string     `orm:"column(password);size(255)" json:"-"`
+	RememberToken string     `orm:"column(remember_token);size(100);null" json:"-"`
+	CreatedAt     time.Time  `orm:"column(created_at);type(timestamp);null" json:"-"`
+	UpdatedAt     time.Time  `orm:"column(updated_at);type(timestamp);null" json:"-"`
 	TerminalId    *Terminals `orm:"null;reverse(one)"`
 	Roles         []*Roles   `orm:"rel(m2m);rel_through(github.com/gnanakeethan/posbin/models.RoleUser)"`
+	Stores        []*Stores  `orm:"reverse(many);rel_table(store_user)"`
 	// StoreId       []*Stores `orm:"column(store_id);rel(fk)"`
 }
 
@@ -51,6 +52,7 @@ func GetUsersById(id int) (v *Users, err error) {
 			o.LoadRelated(el, "Permissions")
 			logs.Info(el)
 		}
+		o.LoadRelated(v, "Stores")
 		return v, nil
 	}
 	return nil, err

@@ -135,6 +135,7 @@ func (c *TerminalsController) GetAll() {
 // @router /empty [get]
 func (c *TerminalsController) GetEmpty() {
 	o := orm.NewOrm()
+	//c.GetUser()
 	sqlDelete := "update terminals set user_id=null where user_id=?"
 	lgout := c.GetString("logout")
 	if lgg, err := strconv.ParseBool(lgout); lgg == true && err == nil {

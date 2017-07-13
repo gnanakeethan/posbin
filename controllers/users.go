@@ -7,13 +7,11 @@ import (
 	"strings"
 
 	"github.com/gnanakeethan/posbin/models"
-
-	"github.com/astaxie/beego"
 )
 
 // oprations for Users
 type UsersController struct {
-	beego.Controller
+	TokenController
 }
 
 func (c *UsersController) URLMapping() {

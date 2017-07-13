@@ -13,7 +13,7 @@ import (
 
 type Terminals struct {
 	Id        int       `orm:"column(id);auto"`
-	UserId    *Users    `orm:"column(user_id);rel(one);"`
+	UserId    *Users    `orm:"column(user_id);rel(one);null"`
 	Machine   string    `orm:"column(machine);size(255)"`
 	Printer   string    `orm:"column(printer);size(255)"`
 	Balance   float64   `orm:"column(balance)"`

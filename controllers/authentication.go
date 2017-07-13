@@ -113,9 +113,6 @@ func (c *AuthenticationController) PostLogout() {
 			response.Token = ""
 			go auth.InvalidateToken(v)
 			c.Data["json"] = response
-		} else {
-
-			c.Data["json"] = err.Error()
 		}
 	} else {
 		c.Data["json"] = err.Error()

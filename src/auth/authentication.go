@@ -49,8 +49,25 @@ func Authenticate(v requests.AuthenticationRequest, response *responses.Authenti
 	}
 	return
 }
+
+func ParseToken(token string) {
+	claims := AuthenticationClaim{}
+	tokenDecoded, _ := jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (interface{}, error) {
+		o := orm.NewOrm()
+		vp := &models.Users{Id: claims.UserId}
+		if err := o.Read(vp); err == nil {
+			return []byte(vp.Username + vp.Email), nil
+		}
+		return []byte(""), nil
+	})
+	if _, ok := tokenDecoded.Claims.(*AuthenticationClaim); ok && tokenDecoded.Valid && extendedValidation(token) {
+		logs.Info(claims)
+	}
+
+}
 func ClearTokens() {
 	o := orm.NewOrm()
+
 	sql := "delete from tokens where valid_thru < now()"
 	_, err := o.Raw(sql).Exec()
 	logs.Error(err)
@@ -61,10 +78,8 @@ func ClearTokens() {
 
 func InvalidateToken(v requests.AuthenticationRefreshRequest) {
 	o := orm.NewOrm()
-	destroyToken := &models.Tokens{}
-	o.QueryTable(new(models.Tokens)).Filter("Token", v.Token).One(destroyToken)
-	destroyToken.Valid = false
-	o.Update(destroyToken)
+	query := "update tokens set `valid` = 0 where `key` = ?;"
+	o.Raw(query, v.Token).Exec()
 }
 
 func ValidateToken(v requests.AuthenticationRefreshRequest, response *responses.Authentication) {
@@ -81,17 +96,12 @@ func ValidateToken(v requests.AuthenticationRefreshRequest, response *responses.
 		return []byte(""), nil
 	})
 
-	if _, ok := token.Claims.(*AuthenticationClaim); ok && token.Valid && extendedValidation(v.Token) && permissionCheck(claims.UserId) {
+	if _, ok := token.Claims.(*AuthenticationClaim); ok && token.Valid && extendedValidation(v.Token) {
 		response.Token = v.Token
 		response.Success = true
 	}
 }
 
-//permissionCheck to be implemneted
-func permissionCheck(userID int) bool {
-
-	return true
-}
 func extendedValidation(token string) bool {
 	o := orm.NewOrm()
 	if count, err := o.QueryTable(new(models.Tokens)).Filter("token", token).Filter("valid", false).Count(); err == nil {

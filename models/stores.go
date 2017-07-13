@@ -10,10 +10,11 @@ import (
 )
 
 type Stores struct {
-	Id        int    `orm:"column(id);auto"`
-	StoreName string `orm:"column(store_name);size(255)"`
-	Address   string `orm:"column(address);size(255)"`
-	ContactNo string `orm:"column(contact_no);size(255)"`
+	Id        int      `orm:"column(id);auto"`
+	StoreName string   `orm:"column(store_name);size(255)"`
+	Address   string   `orm:"column(address);size(255)"`
+	ContactNo string   `orm:"column(contact_no);size(255)"`
+	Users     []*Users `orm:"rel(m2m);rel_table(store_user)"`
 }
 
 func (t *Stores) TableName() string {
@@ -38,6 +39,7 @@ func GetStoresById(id int) (v *Stores, err error) {
 	o := orm.NewOrm()
 	v = &Stores{Id: id}
 	if err = o.Read(v); err == nil {
+		o.LoadRelated(v, "Users")
 		return v, nil
 	}
 	return nil, err

@@ -3,16 +3,15 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 	"strings"
 
-	"github.com/astaxie/beego"
+	"github.com/gnanakeethan/posbin/models"
 )
 
 // oprations for Scales
 type ScalesController struct {
-	beego.Controller
+	TokenController
 }
 
 func (c *ScalesController) URLMapping() {

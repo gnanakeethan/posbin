@@ -33,3 +33,13 @@ func (c *TokenController) Prepare() {
 
 	}
 }
+
+func (c *TokenController) GetUser() {
+	token := c.Ctx.Request.Header.Get("Authorization")
+	if token != "" {
+		auth.ParseToken(token)
+		//auth.ValidateToken(requests.AuthenticationRefreshRequest{Token: token}, &response)
+
+	}
+
+}
