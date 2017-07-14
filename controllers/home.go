@@ -34,7 +34,6 @@ func (c *HomeController) Index() {
 // @router /routes/ [get]
 func (c *HomeController) Routes() {
 	// Encoding the map
-
 	content := beego.PrintTree()
 	routelist := make(map[string]map[string]string)
 	routelist["get"] = make(map[string]string)
