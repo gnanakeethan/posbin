@@ -11,7 +11,7 @@ import (
 
 // oprations for Customers
 type CustomersController struct {
-	TokenController
+	ActionController
 }
 
 func (c *CustomersController) URLMapping() {

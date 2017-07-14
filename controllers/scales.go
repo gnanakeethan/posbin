@@ -11,7 +11,7 @@ import (
 
 // oprations for Scales
 type ScalesController struct {
-	TokenController
+	ActionController
 }
 
 func (c *ScalesController) URLMapping() {

@@ -140,5 +140,6 @@ func init() {
 
 	beego.ErrorController(&controllers.ErrorController{})
 
-	beego.Router("/", &controllers.HomeController{}, "*:Index")
+	beego.Router("/", &controllers.HomeController{}, "GET:Index")
+	beego.Router("/routes/", &controllers.HomeController{}, "GET:Routes")
 }

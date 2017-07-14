@@ -55,7 +55,7 @@ func (c *AuthenticationController) Logout() {
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if v.Validate() {
-			auth.ValidateToken(v, &response)
+			auth.InvalidateToken(v)
 		}
 		c.Data["json"] = response
 

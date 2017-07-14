@@ -8,14 +8,13 @@ import (
 
 	"github.com/gnanakeethan/posbin/models"
 
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 )
 
 // oprations for Terminals
 type TerminalsController struct {
-	beego.Controller
+	ActionController
 }
 
 func (c *TerminalsController) URLMapping() {
@@ -132,7 +131,7 @@ func (c *TerminalsController) GetAll() {
 // @Description get Terminals
 // @Success 200 {object} models.Terminals
 // @Failure 403
-// @router /empty [get]
+// @router /empty/ [get]
 func (c *TerminalsController) GetEmpty() {
 	o := orm.NewOrm()
 	//c.GetUser()

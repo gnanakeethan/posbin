@@ -11,7 +11,7 @@ import (
 
 // oprations for Products
 type ProductsController struct {
-	TokenController
+	ActionController
 }
 
 func (c *ProductsController) URLMapping() {
@@ -151,7 +151,7 @@ func (c *ProductsController) GetAll() {
 // @Param	offset	query	string	false	"Start position of result set. Must be an integer"
 // @Success 200 {object} models.Products
 // @Failure 403
-// @router /bill [get]
+// @router /bill/ [get]
 func (c *ProductsController) GetBill() {
 	var query map[string]string = make(map[string]string)
 	var limit int64 = 10

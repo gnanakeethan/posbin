@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 	"strings"
+
+	"github.com/gnanakeethan/posbin/models"
 
 	"github.com/astaxie/beego"
 )

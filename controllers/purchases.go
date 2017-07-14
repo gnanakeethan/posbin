@@ -11,7 +11,7 @@ import (
 
 // oprations for Purchases
 type PurchasesController struct {
-	TokenController
+	ActionController
 }
 
 func (c *PurchasesController) URLMapping() {

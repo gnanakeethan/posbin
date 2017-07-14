@@ -14,9 +14,10 @@ type InventoryScale struct {
 	Id          int          `orm:"column(id);auto"`
 	InventoryId *Inventories `orm:"column(inventory_id);rel(fk)"`
 	ScaleId     *Scales      `orm:"column(scale_id);rel(fk)"`
-	Units       json.Number  `orm:"column(units)"`
-	Price       json.Number  `orm:"column(price)"`
+	Units       Number       `orm:"column(units)"`
+	Price       Number       `orm:"column(price)"`
 }
+type Number json.Number
 
 func (t *InventoryScale) TableName() string {
 	return "inventory_scale"

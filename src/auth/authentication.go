@@ -13,7 +13,7 @@ import (
 )
 
 var user models.Users
-var validTime int64 = 1200
+var validTime int64 = 600
 
 //Authenticate function defines authentication for user;
 func Authenticate(v requests.AuthenticationRequest, response *responses.Authentication) {
@@ -50,9 +50,9 @@ func Authenticate(v requests.AuthenticationRequest, response *responses.Authenti
 	return
 }
 
-func ParseToken(token string) {
+func ParseToken(token string) *AuthenticationClaim {
 	claims := AuthenticationClaim{}
-	tokenDecoded, _ := jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (interface{}, error) {
+	jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (interface{}, error) {
 		o := orm.NewOrm()
 		vp := &models.Users{Id: claims.UserId}
 		if err := o.Read(vp); err == nil {
@@ -60,10 +60,10 @@ func ParseToken(token string) {
 		}
 		return []byte(""), nil
 	})
-	if _, ok := tokenDecoded.Claims.(*AuthenticationClaim); ok && tokenDecoded.Valid && extendedValidation(token) {
-		logs.Info(claims)
-	}
-
+	//if _, ok := tokenDecoded.Claims.(*AuthenticationClaim); ok && tokenDecoded.Valid && extendedValidation(token) {
+	//	return claims
+	//}
+	return &claims
 }
 func ClearTokens() {
 	o := orm.NewOrm()
@@ -80,6 +80,7 @@ func InvalidateToken(v requests.AuthenticationRefreshRequest) {
 	o := orm.NewOrm()
 	query := "update tokens set `valid` = 0 where `key` = ?;"
 	o.Raw(query, v.Token).Exec()
+	logs.Info(v.Token)
 }
 
 func ValidateToken(v requests.AuthenticationRefreshRequest, response *responses.Authentication) {

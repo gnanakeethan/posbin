@@ -161,3 +161,18 @@ func DeleteUsers(id int) (err error) {
 	}
 	return
 }
+
+func (user *Users) HasRole(role string) bool {
+	o := orm.NewOrm()
+	var roles []*Roles
+	o.Raw("select r.* from users u "+
+		" inner join role_user ru on ru.user_id=u.id"+
+		" inner join roles r on r.id=ru.role_id "+
+		" where u.id=? and r.name=?"+
+		"", user.Id, role).QueryRows(&roles)
+
+	if len(roles) > 0 {
+		return true
+	}
+	return false
+}

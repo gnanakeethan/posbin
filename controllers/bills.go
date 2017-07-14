@@ -11,7 +11,7 @@ import (
 
 // oprations for Bills
 type BillsController struct {
-	TokenController
+	ActionController
 }
 
 func (c *BillsController) URLMapping() {
@@ -68,7 +68,7 @@ func (c *BillsController) GetOne() {
 // @Description Returns all Payable Bills with More balance than paid amount
 // @Success 200 {object} []models.Bills
 // @Security ApiKeyAuthentication
-// @router /payable [get]
+// @router /payable/ [get]
 func (c *BillsController) GetPayable() {
 	l, err := models.GetPayableBills()
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 
 // oprations for Discountables
 type DiscountablesController struct {
-	TokenController
+	ActionController
 }
 
 func (c *DiscountablesController) URLMapping() {

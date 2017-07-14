@@ -11,7 +11,7 @@ import (
 
 // oprations for Sales
 type SalesController struct {
-	TokenController
+	ActionController
 }
 
 func (c *SalesController) URLMapping() {
