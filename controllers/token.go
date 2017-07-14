@@ -33,6 +33,7 @@ func (c *ActionController) Prepare() {
 			method := c.Ctx.Request.Method
 			paths := strings.Split(c.Ctx.Request.URL.Path, "/")
 			permissionString := strings.ToLower(paths[0] + "_" + method)
+			//logs.Info(permissionString)
 			if claims.UserId != 0 && !user.HasRole("superadmin") {
 				var permissions []*models.Permissions
 				customquery := "select p.* from users u inner join role_user ru on ru.user_id=u.id " +
