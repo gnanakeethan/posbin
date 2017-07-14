@@ -4,7 +4,6 @@ import (
 	"strconv"
 	"strings"
 
-	"fmt"
 	"sort"
 
 	"github.com/astaxie/beego"
@@ -61,14 +60,12 @@ func (c *HomeController) Routes() {
 		}
 		//logs.Info(el)
 	}
-
-	fmt.Println("UNSORTED")
 	sort.Sort(Alphabetic(routemap))
 	c.Data["json"] = routemap
-
 	c.ServeJSON()
 }
 
+///sorting stuff
 type Alphabetic []string
 
 func (list Alphabetic) Len() int { return len(list) }
