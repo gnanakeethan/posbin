@@ -55,9 +55,7 @@ func (c *HomeController) Routes() {
 	for _, method := range routelist {
 		for key, lap := range method {
 			routemap = append(routemap, strings.Replace(key, "/", "_", -1)+lap)
-			//logs.Info(lap)
 		}
-		//logs.Info(el)
 	}
 	sort.Sort(Alphabetic(routemap))
 	c.Data["json"] = routemap
