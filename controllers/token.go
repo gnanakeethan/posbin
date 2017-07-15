@@ -48,9 +48,7 @@ func (c *ActionController) Prepare() {
 					response.Success = true
 				}
 			}
-
 		}
-
 		if !response.Success {
 			c.Abort("401")
 		}
