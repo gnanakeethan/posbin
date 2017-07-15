@@ -6,13 +6,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/astaxie/beego"
 	"github.com/gnanakeethan/posbin/models"
 )
 
 // oprations for Roles
 type RolesController struct {
-	beego.Controller
+	ActionController
 }
 
 func (c *RolesController) URLMapping() {
