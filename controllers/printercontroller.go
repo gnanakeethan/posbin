@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
+	"strconv"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/gnanakeethan/posbin/models"
-	"strconv"
 )
 
 // AuthenticationController operations for Authentication
 type PrinterController struct {
-	beego.Controller
+	ActionController
 }
 
 func (c *PrinterController) URLMapping() {

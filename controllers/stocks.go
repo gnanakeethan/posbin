@@ -3,16 +3,15 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 	"strings"
 
-	"github.com/astaxie/beego"
+	"github.com/gnanakeethan/posbin/models"
 )
 
 // oprations for Stocks
 type StocksController struct {
-	beego.Controller
+	ActionController
 }
 
 func (c *StocksController) URLMapping() {

@@ -6,7 +6,6 @@ import (
 	"regexp"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/gnanakeethan/posbin/models"
 	"github.com/gnanakeethan/posbin/requests"
@@ -37,7 +36,6 @@ func (c *ActionController) Prepare() {
 			var re = regexp.MustCompile(`\/(\d+)`)
 			path := c.Ctx.Request.URL.Path
 			permissionString := getPermissionString(re, path, method)
-			logs.Info(permissionString)
 			if claims.UserId != 0 && !user.HasRole("superadmin") {
 				var permissions []*models.Permissions
 				customquery := "select p.* from users u inner join role_user ru on ru.user_id=u.id " +
