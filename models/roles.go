@@ -43,6 +43,7 @@ func GetRolesById(id int) (v *Roles, err error) {
 	o := orm.NewOrm()
 	v = &Roles{Id: id}
 	if err = o.Read(v); err == nil {
+		o.LoadRelated(v, "Permissions")
 		return v, nil
 	}
 	return nil, err

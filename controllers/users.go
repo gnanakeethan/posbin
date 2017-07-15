@@ -6,12 +6,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/astaxie/beego"
 	"github.com/gnanakeethan/posbin/models"
 )
 
 // oprations for Users
 type UsersController struct {
-	ActionController
+	beego.Controller
 }
 
 func (c *UsersController) URLMapping() {
@@ -57,6 +58,26 @@ func (c *UsersController) GetOne() {
 	if err != nil {
 		c.Data["json"] = err.Error()
 	} else {
+		c.Data["json"] = v
+	}
+	c.ServeJSON()
+}
+
+// @Title GetPermissions
+// @Description get Users by id
+// @Param	id		path 	string	true		"The key for staticblock"
+// @Success 200 {object} []models.Permissions
+// @Failure 403 :id is empty
+// @router /:id/permissions/ [get]
+// @Security ApiKeyAuthentication
+func (c *UsersController) GetPermissions() {
+	idStr := c.Ctx.Input.Param(":id")
+	id, _ := strconv.Atoi(idStr)
+	v, err := models.GetPermissionsForUser(id)
+	if err != nil {
+		c.Data["json"] = err.Error()
+	} else {
+
 		c.Data["json"] = v
 	}
 	c.ServeJSON()

@@ -36,6 +36,21 @@ func AddPermissions(m *Permissions) (id int64, err error) {
 	return
 }
 
+// GetPermissionsForUser retrieves all permissions of the user
+func GetPermissionsForUser(id int) (v []*Permissions, err error) {
+	o := orm.NewOrm()
+	query := "select p.* from users u inner join role_user ru on ru.user_id=u.id " +
+		"inner join roles r on ru.role_id=r.id " +
+		"inner join permission_role rp on rp.role_id=r.id " +
+		"inner join permissions p on p.id=rp.permission_id " +
+		"where u.id = ?"
+	if _, err := o.Raw(query, id).QueryRows(&v); err == nil {
+		return v, nil
+	}
+	return nil, err
+
+}
+
 // GetPermissionsById retrieves Permissions by Id. Returns error if
 // Id doesn't exist
 func GetPermissionsById(id int) (v *Permissions, err error) {

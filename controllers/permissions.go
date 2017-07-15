@@ -3,11 +3,14 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gnanakeethan/posbin/models"
 	"strconv"
 	"strings"
 
+	"github.com/gnanakeethan/posbin/models"
+
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
 )
 
 // oprations for Permissions
@@ -161,5 +164,60 @@ func (c *PermissionsController) Delete() {
 	} else {
 		c.Data["json"] = err.Error()
 	}
+	c.ServeJSON()
+}
+
+// @Title Delete
+// @Description delete the Permissions
+// @Param	id		path 	string	true		"The id you want to delete"
+// @Success 200 {string} delete success!
+// @Failure 403 id is empty
+// @router /update_permissions/ [get]
+func (c *PermissionsController) Routes() {
+	// Encoding the map
+	content := beego.PrintTree()
+	routelist := make(map[string]map[string]string)
+	routelist["get"] = make(map[string]string)
+	routelist["put"] = make(map[string]string)
+	routelist["post"] = make(map[string]string)
+	routelist["delete"] = make(map[string]string)
+	for _, el := range content["Data"].(map[string]interface{}) {
+		elp := el.(*[][]string)
+		for _, p := range *elp {
+			p[0] = strings.Replace(p[0], ":id/", "id/", -1)
+			p[0] = strings.Replace(p[0], ":id", "id/", -1)
+			p[0] = strings.TrimPrefix(p[0], "/v1/")
+			p[1] = strings.Replace(p[1], "map[", "", -1)
+			p[1] = strings.Replace(p[1], "]", "", -1)
+			method := strings.ToLower(strings.Split(p[1], ":")[0])
+			routelist[method][p[0]] = method
+		}
+	}
+	routemap := make(map[string]string)
+	for _, method := range routelist {
+		for key, lap := range method {
+			routemap[strings.Replace(key, "/", "_", -1)+lap] = lap
+		}
+	}
+	o := orm.NewOrm()
+	for route, method := range routemap {
+
+		permission := &models.Permissions{Name: route}
+		permission.DisplayName = strings.Replace(route, "_", " ", -1)
+		permission.DisplayName = strings.Title(permission.DisplayName)
+		switch method {
+		case "get":
+			permission.Description = "CAN RETRIEVE " + strings.Replace(strings.TrimSuffix(route, "get"), "_", "/", -1)
+		case "post":
+			permission.Description = "CAN CREATE " + strings.Replace(strings.TrimSuffix(route, "post"), "_", "/", -1)
+		case "put":
+			permission.Description = "CAN UPDATE " + strings.Replace(strings.TrimSuffix(route, "put"), "_", "/", -1)
+		case "delete":
+			permission.Description = "CAN DELETE " + strings.Replace(strings.TrimSuffix(route, "delete"), "_", "/", -1)
+		}
+		o.InsertOrUpdate(permission, "name")
+		logs.Info(permission)
+	}
+	c.Data["json"] = routemap
 	c.ServeJSON()
 }
