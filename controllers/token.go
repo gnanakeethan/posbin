@@ -3,7 +3,10 @@ package controllers
 import (
 	"strings"
 
+	"regexp"
+
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/gnanakeethan/posbin/models"
 	"github.com/gnanakeethan/posbin/requests"
@@ -31,9 +34,10 @@ func (c *ActionController) Prepare() {
 			claims := auth.ParseToken(token)
 			user := models.Users{Id: claims.UserId}
 			method := c.Ctx.Request.Method
-			paths := strings.Split(c.Ctx.Request.URL.Path, "/")
-			permissionString := strings.ToLower(paths[0] + "_" + method)
-			//logs.Info(permissionString)
+			var re = regexp.MustCompile(`\/(\d+)`)
+			path := c.Ctx.Request.URL.Path
+			permissionString := getPermissionString(re, path, method)
+			logs.Info(permissionString)
 			if claims.UserId != 0 && !user.HasRole("superadmin") {
 				var permissions []*models.Permissions
 				customquery := "select p.* from users u inner join role_user ru on ru.user_id=u.id " +
@@ -54,6 +58,10 @@ func (c *ActionController) Prepare() {
 		}
 
 	}
+}
+func getPermissionString(re *regexp.Regexp, path, method string) string {
+	permissionString := strings.ToLower(strings.Replace(strings.TrimPrefix(re.ReplaceAllString(path, ``), "/v1/"), "/", "_", -1) + "_" + method)
+	return permissionString
 }
 
 func (c *ActionController) GetUser() {
