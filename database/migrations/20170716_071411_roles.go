@@ -28,5 +28,4 @@ func (m *Roles_20170716_071411) ddlSpec() {
 	m.NewCol("description").SetNullable(true).SetDataType("VARCHAR(255)")
 	m.NewCol("created_at").SetNullable(true).SetDataType("DATETIME").SetDefault("NULL")
 	m.NewCol("updated_at").SetNullable(true).SetDataType("DATETIME").SetDefault("NULL")
-
 }
