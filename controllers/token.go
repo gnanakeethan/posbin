@@ -66,11 +66,12 @@ func getPermissionString(re *regexp.Regexp, path, method string) string {
 func (c *ActionController) GetUser() *models.Users {
 	token := c.Ctx.Request.Header.Get("Authorization")
 	o := orm.NewOrm()
-	user := models.Users{}
+	logs.Info("token#" + token)
 	if token != "" {
 		claims := auth.ParseToken(token)
 		user := models.Users{Id: claims.UserId}
 		o.Read(&user)
+		return &user
 	}
-	return &user
+	return nil
 }

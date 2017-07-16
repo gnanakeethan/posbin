@@ -8,6 +8,7 @@ import (
 
 	"github.com/gnanakeethan/posbin/models"
 
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -77,7 +78,9 @@ func (c *TerminalsController) RequestTerminal() {
 		return
 	}
 	v, err := models.GetTerminalsById(id)
-	v.UserId = c.GetUser()
+	user := c.GetUser().Id
+	v.UserId = &models.Users{Id: user}
+	logs.Info(user)
 	models.UpdateTerminalsById(v)
 	if err != nil {
 		c.Data["json"] = err.Error()

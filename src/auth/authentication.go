@@ -52,7 +52,7 @@ func Authenticate(v requests.AuthenticationRequest, response *responses.Authenti
 
 func ParseToken(token string) *AuthenticationClaim {
 	claims := AuthenticationClaim{}
-	jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (interface{}, error) {
+	tokenDecoded, _ := jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (interface{}, error) {
 		o := orm.NewOrm()
 		vp := &models.Users{Id: claims.UserId}
 		if err := o.Read(vp); err == nil {
@@ -60,10 +60,10 @@ func ParseToken(token string) *AuthenticationClaim {
 		}
 		return []byte(""), nil
 	})
-	//if _, ok := tokenDecoded.Claims.(*AuthenticationClaim); ok && tokenDecoded.Valid && extendedValidation(token) {
-	//	return claims
-	//}
-	return &claims
+	if _, ok := tokenDecoded.Claims.(*AuthenticationClaim); ok && tokenDecoded.Valid && extendedValidation(token) {
+		return &claims
+	}
+	return nil
 }
 func ClearTokens() {
 	o := orm.NewOrm()

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/imdario/mergo"
 )
 
 type Terminals struct {
@@ -129,15 +129,15 @@ func UpdateTerminalsById(m *Terminals) (err error) {
 	o := orm.NewOrm()
 	v := Terminals{Id: m.Id}
 	// ascertain id exists in the database
+	logs.Info(m.UserId)
+	logs.Info(m.UserId)
 	if err = o.Read(&v); err == nil {
-		if err = mergo.Merge(m, &v); err == nil {
-			var num int64
-			if num, err = o.Update(m); err == nil {
-				fmt.Println("Number of records updated in database:", num)
-			}
+		var num int64
+		if num, err = o.Update(m); err == nil {
+			fmt.Println("Number of records updated in database:", num)
 		}
 	}
-	return
+	return nil
 }
 
 // DeleteTerminals deletes Terminals by Id and returns error if
