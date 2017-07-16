@@ -1,5 +1,5 @@
 hash: be97047c6091b9e04845c60d1e90665d11c485d5f4a8cd7cac0f017521a2becf
-updated: 2017-07-14T12:48:33.700323562+05:30
+updated: 2017-07-16T07:11:47.76881912+05:30
 imports:
 - name: github.com/astaxie/beego
   version: 7c2ec075a4fb45ca4dd25e7ae7585417d9c99b53
@@ -18,7 +18,7 @@ imports:
   - toolbox
   - utils
 - name: github.com/casbin/casbin
-  version: 27a24f1712c2b786be8b3fc996e0c513d35bae67
+  version: b173bc2e9dc0c12d512b145129431328662403db
 - name: github.com/dgrijalva/jwt-go
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/go-sql-driver/mysql
