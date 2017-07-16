@@ -1,8 +1,8 @@
 hash: be97047c6091b9e04845c60d1e90665d11c485d5f4a8cd7cac0f017521a2becf
-updated: 2017-07-16T07:11:47.76881912+05:30
+updated: 2017-07-16T09:37:44.101249486+05:30
 imports:
 - name: github.com/astaxie/beego
-  version: 7c2ec075a4fb45ca4dd25e7ae7585417d9c99b53
+  version: 8bb0a70847726f36edd1ac8e8ffcd28899e29fb8
   repo: https://github.com/gnanakeethan/beego
   vcs: git
   subpackages:
