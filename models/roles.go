@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -128,10 +129,20 @@ func GetAllRoles(query map[string]string, fields []string, sortby []string, orde
 func UpdateRolesById(m *Roles) (err error) {
 	o := orm.NewOrm()
 	v := Roles{Id: m.Id}
+	m2m := o.QueryM2M(&v, "Permissions")
+	suc, err := m2m.Clear()
+	logs.Info(suc, err)
+	for _, p := range m.Permissions {
+		logs.Info(p)
+		if p != nil {
+			m2m.Add(p)
+		}
+	}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
 		if num, err = o.Update(m); err == nil {
+
 			fmt.Println("Number of records updated in database:", num)
 		}
 	}

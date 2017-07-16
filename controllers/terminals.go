@@ -8,7 +8,6 @@ import (
 
 	"github.com/gnanakeethan/posbin/models"
 
-	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -60,6 +59,30 @@ func (c *TerminalsController) GetOne() {
 		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = v
+	}
+	c.ServeJSON()
+}
+
+// @Title Request Terminal
+// @Description Request Terminal for billing
+// @Param	id		path 	string	true		"The key for staticblock"
+// @Success 200 {object} models.Terminals
+// @Failure 403 :id is empty
+// @router /request/:id/ [get]
+func (c *TerminalsController) RequestTerminal() {
+	c.ClearUsers()
+	idStr := c.Ctx.Input.Param(":id")
+	id, _ := strconv.Atoi(idStr)
+	if id < 1 {
+		return
+	}
+	v, err := models.GetTerminalsById(id)
+	v.UserId = c.GetUser()
+	models.UpdateTerminalsById(v)
+	if err != nil {
+		c.Data["json"] = err.Error()
+	} else {
+		c.Data["json"] = "OK"
 	}
 	c.ServeJSON()
 }
@@ -133,22 +156,25 @@ func (c *TerminalsController) GetAll() {
 // @Failure 403
 // @router /empty/ [get]
 func (c *TerminalsController) GetEmpty() {
+	c.ClearUsers()
 	o := orm.NewOrm()
-	//c.GetUser()
-	sqlDelete := "update terminals set user_id=null where user_id=?"
-	lgout := c.GetString("logout")
-	if lgg, err := strconv.ParseBool(lgout); lgg == true && err == nil {
-		logs.Info(lgout)
-		o.Raw(sqlDelete, lgout).Exec()
-	}
-	sql := "select * from terminals where user_id is null;"
+	sql := "select * from terminals where user_id is null and store_id = ?;"
+	store_id := c.GetString("store_id", "0")
+
 	var terminals []models.Terminals
-	if _, err := o.Raw(sql).QueryRows(&terminals); err == nil {
+	if _, err := o.Raw(sql, store_id).QueryRows(&terminals); err == nil {
 		c.Data["json"] = terminals
 	} else {
 		c.Data["json"] = err.Error()
 	}
 	c.ServeJSON()
+}
+
+func (c *TerminalsController) ClearUsers() {
+	o := orm.NewOrm()
+	user := *c.GetUser()
+	sqlDelete := "update terminals set user_id=null where user_id=?"
+	o.Raw(sqlDelete, user.Id).Exec()
 }
 
 // @Title Update

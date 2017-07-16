@@ -136,7 +136,8 @@ func (c *RolesController) Put() {
 	v := models.Roles{Id: id}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		if err := models.UpdateRolesById(&v); err == nil {
-			c.Data["json"] = v
+			p, _ := models.GetRolesById(id)
+			c.Data["json"] = p
 		} else {
 			c.Data["json"] = err.Error()
 		}

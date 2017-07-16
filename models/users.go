@@ -22,7 +22,10 @@ type Users struct {
 	TerminalId    *Terminals `orm:"null;reverse(one)"`
 	Roles         []*Roles   `orm:"rel(m2m);rel_through(github.com/gnanakeethan/posbin/models.RoleUser)"`
 	Stores        []*Stores  `orm:"reverse(many);rel_table(store_user)"`
-	// StoreId       []*Stores `orm:"column(store_id);rel(fk)"`
+}
+type UsersPassword struct {
+	Id       int    `orm:"column(id);auto"`
+	Password string `orm:"column(password);size(255)"`
 }
 
 func (t *Users) TableName() string {
@@ -110,7 +113,7 @@ func GetAllUsers(query map[string]string, fields []string, sortby []string, orde
 	}
 
 	var l []Users
-	qs = qs.OrderBy(sortFields...)
+	qs = qs.OrderBy(sortFields...).RelatedSel()
 	if _, err := qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
 			for _, v := range l {
@@ -137,6 +140,23 @@ func GetAllUsers(query map[string]string, fields []string, sortby []string, orde
 func UpdateUsersById(m *Users) (err error) {
 	o := orm.NewOrm()
 	v := Users{Id: m.Id}
+
+	m2m := o.QueryM2M(&v, "Roles")
+	m2m.Clear()
+	for _, p := range m.Roles {
+		logs.Info(p)
+		if p != nil {
+			m2m.Add(p)
+		}
+	}
+	m2m = o.QueryM2M(&v, "Stores")
+	m2m.Clear()
+	for _, q := range m.Stores {
+		logs.Info(q)
+		if q != nil {
+			m2m.Add(q)
+		}
+	}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64

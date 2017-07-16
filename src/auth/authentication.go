@@ -72,8 +72,6 @@ func ClearTokens() {
 	_, err := o.Raw(sql).Exec()
 	logs.Error(err)
 
-	sql = "update terminals set user_id null"
-	o.Raw(sql).Exec()
 }
 
 func InvalidateToken(v requests.AuthenticationRefreshRequest) {

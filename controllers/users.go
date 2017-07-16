@@ -6,7 +6,10 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/gnanakeethan/posbin/models"
 )
 
@@ -156,9 +159,20 @@ func (c *UsersController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v := models.Users{Id: id}
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+	p := models.UsersPassword{Id: id}
+	if err, err2 := json.Unmarshal(c.Ctx.Input.RequestBody, &v), json.Unmarshal(c.Ctx.Input.RequestBody, &p); err == nil && err2 == nil {
+		logs.Info(p.Password)
+
+		if p.Password != "" {
+			if pw, err := bcrypt.GenerateFromPassword([]byte(p.Password), 15); err == nil {
+				v.Password = string(pw)
+			}
+		}
+		logs.Info(v.Password)
+
 		if err := models.UpdateUsersById(&v); err == nil {
-			c.Data["json"] = "OK"
+			p, _ := models.GetUsersById(id)
+			c.Data["json"] = p
 		} else {
 			c.Data["json"] = err.Error()
 		}
