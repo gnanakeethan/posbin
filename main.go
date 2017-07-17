@@ -6,6 +6,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"github.com/gnanakeethan/posbin/database"
 )
 
 func init() {
@@ -24,6 +25,7 @@ func gC(conf string) string {
 }
 
 func main() {
+	database.Migrate()
 
 	//Enables GZip functionality
 	beego.BConfig.EnableGzip = true
