@@ -16,7 +16,6 @@ func init() {
 	if gC("runmode") == "dev" {
 		orm.Debug = true
 	}
-
 }
 
 // gC grabs the application configuration using beego method
@@ -47,13 +46,10 @@ func main() {
 	beego.SetStaticPath("/manifest.json", "public/manifest.json")
 	beego.SetStaticPath("/index.html", gC("publicdir")+"/index.html")
 	beego.SetStaticPath("/", gC("publicdir")+"/index.html")
+
+	//Static Directory Configurations
 	beego.BConfig.WebConfig.StaticDir["/bower_components"] = gC("publicdir") + "/bower_components"
 	beego.BConfig.WebConfig.StaticDir["/src"] = gC("publicdir") + "/src"
-	//beego.InsertFilter("/v1/*", beego.BeforeRouter, cors.Allow(&cors.Options{
-	//	AllowAllOrigins: true,
-	//	AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-	//	AllowHeaders:    []string{"Origin", "Content-Type", "Authorization", "Access-Control-Allow-Origin"},
-	//	ExposeHeaders:   []string{"Content-Length", "Access-Control-Allow-Origin"},
-	//}))
+
 	beego.Run()
 }
