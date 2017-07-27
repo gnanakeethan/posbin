@@ -1,7 +1,6 @@
 package database
 
 import (
-	_ "github.com/gnanakeethan/posbin/database/migrations"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 )
