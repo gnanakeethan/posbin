@@ -160,6 +160,7 @@ func UpdateSalesById(m *Sales, reset bool) (err error) {
 		o.Raw(sql, v.InventoryId.Id).Values(&list)
 		remUnits := int(m.Units)
 		if len(list) > 0 {
+			//TODO: doing the stock calculation shit
 
 			pr, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
 			av, _ := strconv.Atoi(list[len(list)-1]["average_cost"].(string))
