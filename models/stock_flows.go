@@ -14,7 +14,7 @@ type StockFlows struct {
 	Id            int          `orm:"column(id);auto"`
 	Flow          float64      `orm:"column(flow)"`
 	InventoryId   *Inventories `orm:"column(inventory_id);rel(fk)"`
-	StockableId   uint         `orm:"column(stockable_id);null"`
+	StockableId   int         `orm:"column(stockable_id);null"`
 	StockableType string       `orm:"column(stockable_type);size(255);null"`
 	CreatedAt     time.Time    `orm:"column(created_at);type(timestamp);null"`
 	UpdatedAt     time.Time    `orm:"column(updated_at);type(timestamp);null"`

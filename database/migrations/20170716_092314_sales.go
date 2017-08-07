@@ -34,5 +34,6 @@ func (m *Sales_20170716_092314) ddlSpec() {
 	m.NewCol("amount").SetDataType("DOUBLE(12,2)").SetNullable(false).SetDefault("1")
 	m.NewCol("created_at").SetNullable(true).SetDataType("DATETIME").SetDefault("NULL")
 	m.NewCol("updated_at").SetNullable(true).SetDataType("DATETIME").SetDefault("NULL")
+	m.NewCol("deleted_at").SetNullable(true).SetDataType("DATETIME").SetDefault("NULL")
 
 }

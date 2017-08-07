@@ -23,8 +23,8 @@ func init() {
 func (m *StoreUser_20170716_090051) ddlSpec() {
 	m.CreateTable("store_user", "InnoDB", "utf8")
 	m.PriCol("id").SetAuto(true).SetNullable(false).SetDataType("INT(10)").SetUnsigned(true)
-	store := m.ForeignCol("store_id", "id", "stores").SetDataType("INT(10)").SetNullable(true).SetUnsigned(true)
-	user := m.ForeignCol("user_id", "id", "users").SetDataType("INT(10)").SetNullable(true).SetUnsigned(true)
+	store := m.ForeignCol("stores_id", "id", "stores").SetDataType("INT(10)").SetNullable(true).SetUnsigned(true)
+	user := m.ForeignCol("users_id", "id", "users").SetDataType("INT(10)").SetNullable(true).SetUnsigned(true)
 
 	//Set Unique
 	unique := migration.Unique{Definition: "store_user"}

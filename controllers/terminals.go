@@ -81,6 +81,7 @@ func (c *TerminalsController) RequestTerminal() {
 	user := c.GetUser().Id
 	v.UserId = &models.Users{Id: user}
 	logs.Info(user)
+	logs.Info("look here");
 	models.UpdateTerminalsById(v)
 	if err != nil {
 		c.Data["json"] = err.Error()

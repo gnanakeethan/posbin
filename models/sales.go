@@ -163,6 +163,15 @@ func UpdateSalesById(m *Sales, reset bool) (err error) {
 		if len(list) > 0 {
 			//TODO: doing the stock calculation shit
 			// rem units must be deduced from the stock in the db
+			// the record to be created in tempstock and deduced from many
+			//this is something crazy to be done with things and so on that it does many things
+			stockflow := &StockFlows{}
+			stockflow.StockableType = "Sales"
+			stockflow.StockableId = v.Id
+			stockflow.InventoryId = v.InventoryId
+			dd,err := o.InsertOrUpdate(stockflow, "stockable_id", "inventory_id", "stockable_type")
+			logs.Info(dd);
+			logs.Info(err);
 
 			pr, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
 			av, _ := strconv.Atoi(list[len(list)-1]["average_cost"].(string))

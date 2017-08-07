@@ -23,8 +23,11 @@ func init() {
 func (m *StockFlows_20170716_091143) ddlSpec() {
 	m.CreateTable("stock_flows", "InnoDB", "utf8")
 	m.PriCol("id").SetAuto(true).SetNullable(false).SetDataType("INT(10)").SetUnsigned(true)
-	m.ForeignCol("stock_id", "id", "stocks").SetDataType("INT(10)").SetUnsigned(true).SetDefault("NULL")
+	m.ForeignCol("inventory_id", "id", "inventories").SetDataType("INT(10)").SetUnsigned(true).SetDefault("NULL")
+
 	m.NewCol("flow").SetDataType("DOUBLE(4,2)").SetNullable(false).SetDefault("1")
+	m.NewCol("stockable_id").SetNullable(true).SetDataType("VARCHAR(255)").SetDefault("NULL")
+	m.NewCol("stockable_type").SetNullable(true).SetDataType("VARCHAR(255)").SetDefault("NULL")
 	m.NewCol("created_at").SetNullable(true).SetDataType("DATETIME").SetDefault("NULL")
 	m.NewCol("updated_at").SetNullable(true).SetDataType("DATETIME").SetDefault("NULL")
 
