@@ -159,8 +159,10 @@ func UpdateSalesById(m *Sales, reset bool) (err error) {
 		var list []orm.Params
 		o.Raw(sql, v.InventoryId.Id).Values(&list)
 		remUnits := int(m.Units)
+
 		if len(list) > 0 {
 			//TODO: doing the stock calculation shit
+			// rem units must be deduced from the stock in the db
 
 			pr, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
 			av, _ := strconv.Atoi(list[len(list)-1]["average_cost"].(string))
