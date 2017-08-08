@@ -23,6 +23,7 @@ func init() {
 func (m *Inventories_20170716_090814) ddlSpec() {
 	m.CreateTable("inventories", "InnoDB", "utf8")
 	m.PriCol("id").SetAuto(true).SetNullable(false).SetDataType("INT(10)").SetUnsigned(true)
+	m.NewCol("expiry").SetNullable(true).SetDataType("DATETIME").SetDefault("NULL")
 	m.ForeignCol("product_id", "id", "products").SetDataType("INT(10)").SetUnsigned(true).SetDefault("NULL")
 	m.NewCol("batch_no").SetDataType("VARCHAR(255)").SetNullable(false)
 	m.NewCol("created_at").SetNullable(true).SetDataType("DATETIME").SetDefault("NULL")

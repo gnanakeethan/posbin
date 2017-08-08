@@ -32,6 +32,7 @@ func (m *Products_20170716_085355) ddlSpec() {
 	m.NewCol("image").SetDataType("BLOB").SetDefault("NULL")
 	m.NewCol("image_type").SetDataType("VARCHAR(20)").SetDefault("NULL")
 	m.ForeignCol("scale_id", "id", "scales").SetDataType("INT(10)").SetUnsigned(true).SetDefault("NULL")
+	m.ForeignCol("store_id", "id", "stores").SetDataType("INT(10)").SetUnsigned(true).SetDefault("NULL")
 	m.NewCol("service").SetDataType("TINYINT(1)").SetNullable(false).SetDefault("0")
 	m.NewCol("created_at").SetNullable(true).SetDataType("DATETIME").SetDefault("NULL")
 	m.NewCol("updated_at").SetNullable(true).SetDataType("DATETIME").SetDefault("NULL")

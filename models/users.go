@@ -56,6 +56,7 @@ func GetUsersById(id int) (v *Users, err error) {
 			logs.Info(el)
 		}
 		o.LoadRelated(v, "Stores")
+		logs.Info(v);
 		return v, nil
 	}
 	return nil, err

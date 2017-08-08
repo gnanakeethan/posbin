@@ -25,5 +25,5 @@ func (m *Stores_20170713_201929) ddlSpec() {
 	m.PriCol("id").SetAuto(true).SetNullable(false).SetDataType("INT(10)").SetUnsigned(true)
 	m.UniCol("name_unique", "store_name").SetDataType("VARCHAR(255)").SetNullable(false)
 	m.NewCol("address").SetDataType("text").SetNullable(true).SetDefault("NULL")
-	m.NewCol("contact").SetDataType("tinytext").SetNullable(true).SetDefault("NULL")
+	m.NewCol("contact_no").SetDataType("tinytext").SetNullable(true).SetDefault("NULL")
 }
