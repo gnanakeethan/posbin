@@ -169,9 +169,9 @@ func UpdateSalesById(m *Sales, reset bool) (err error) {
 			stockflow.StockableType = "Sales"
 			stockflow.StockableId = v.Id
 			stockflow.InventoryId = v.InventoryId
-			dd,err := o.InsertOrUpdate(stockflow, "stockable_id", "inventory_id", "stockable_type")
-			logs.Info(dd);
-			logs.Info(err);
+			dd, err := o.InsertOrUpdate(stockflow, "stockable_id", "inventory_id", "stockable_type")
+			logs.Info(dd)
+			logs.Info(err)
 
 			pr, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
 			av, _ := strconv.Atoi(list[len(list)-1]["average_cost"].(string))
