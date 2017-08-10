@@ -154,11 +154,17 @@ func UpdateSalesById(m *Sales, reset bool) (err error) {
 		if m.UnitPrice <= 0 {
 			m.UnitPrice = v.UnitPrice
 		}
-		sql := "select p.id,p.name,i.id,purchases.average_cost,ins.price,ins.units from inventories i inner join products p on i.product_id= p.id inner join purchases on purchases.inventory_id = i.id inner join inventory_scale ins on ins.inventory_id=i.id where i.id=? order by units desc"
+		sql := "select p.id,p.name,p.singular,i.id,purchases.average_cost,ins.price,ins.units from inventories i inner join products p on i.product_id= p.id inner join purchases on purchases.inventory_id = i.id inner join inventory_scale ins on ins.inventory_id=i.id where i.id=? order by units desc"
 
 		var list []orm.Params
 		o.Raw(sql, v.InventoryId.Id).Values(&list)
-		remUnits := int(m.Units)
+		remUnits := float64(m.Units)
+		if (list[0]["singular"] == "1") {
+			logs.Info("testingsign");
+			remtd := int(remUnits);
+			remUnits = float64(remtd);
+			m.Units = remUnits;
+		}
 
 		if len(list) > 0 {
 			//TODO: doing the stock calculation shit
@@ -169,9 +175,11 @@ func UpdateSalesById(m *Sales, reset bool) (err error) {
 			stockflow.StockableType = "Sales"
 			stockflow.StockableId = v.Id
 			stockflow.InventoryId = v.InventoryId
-			dd, err := o.InsertOrUpdate(stockflow, "stockable_id", "inventory_id", "stockable_type")
-			logs.Info(dd)
-			logs.Info(err)
+			//			dd, err := o.InsertOrUpdate(stockflow, "stockable_id", "stockable_type", "inventory_id")
+			if _, _, err := o.ReadOrCreate(stockflow, "stockable_id", "stockable_type", "inventory_id"); err == nil {
+				stockflow.Flow = remUnits
+				o.Update(stockflow)
+			}
 
 			pr, _ := strconv.Atoi(list[len(list)-1]["price"].(string))
 			av, _ := strconv.Atoi(list[len(list)-1]["average_cost"].(string))
@@ -188,14 +196,14 @@ func UpdateSalesById(m *Sales, reset bool) (err error) {
 				scaleunit := float64(sc)
 				price := float64(pr) / scaleunit
 				remt := int(remUnits) % int(scaleunit)
-				times := int(remUnits) / int(scaleunit)
+				times := float64(remUnits) / float64(scaleunit)
 				if m.UnitPrice-float64(prv) < 0 {
 					m.Discount += math.Abs(m.UnitPrice-float64(prv)) * float64(times) * float64(scaleunit)
 				} else {
 					m.Discount += math.Abs(price-m.UnitPrice) * float64(times) * float64(scaleunit)
 				}
 
-				remUnits = remt
+				remUnits = float64(remt)
 			}
 
 		}
