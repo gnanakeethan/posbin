@@ -3,13 +3,14 @@ package controllers
 import (
 	"strconv"
 
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/gnanakeethan/posbin/models"
 )
 
 // AuthenticationController operations for Authentication
 type PrinterController struct {
-	ActionController
+	beego.Controller
 }
 
 func (c *PrinterController) URLMapping() {
@@ -33,7 +34,7 @@ func (c *PrinterController) Index() {
 	query["BillId"] = idStr
 	sortby = append(sortby, "Id")
 	order = append(order, "asc")
-	p, err := models.GetAllSales(query, fields, sortby, order, 0, 100)
+	p, err := models.GetAllSales(query, fields, sortby, order, 0, 1000)
 
 	logs.Info(p)
 	logs.Info(v)
