@@ -58,6 +58,7 @@ func (c *UsersController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(idStr)
 	v, err := models.GetUsersById(id)
+
 	if err != nil {
 		c.Data["json"] = err.Error()
 	} else {

@@ -640,7 +640,7 @@ CREATE TABLE `stores` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `store_name` varchar(255) NOT NULL,
   `address` text DEFAULT NULL,
-  `contact` tinytext DEFAULT NULL,
+  `contact_no` tinytext DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_unique` (`store_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;

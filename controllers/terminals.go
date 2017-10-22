@@ -168,6 +168,7 @@ func (c *TerminalsController) GetEmpty() {
 	var terminals []models.Terminals
 	if _, err := o.Raw(sql, store_id).QueryRows(&terminals); err == nil {
 		c.Data["json"] = terminals
+		logs.Info(terminals);
 	} else {
 		c.Data["json"] = err.Error()
 	}
