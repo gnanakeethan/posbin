@@ -7,12 +7,14 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego/orm"
+	"time"
 )
 
 type Stocks struct {
 	Id             int          `orm:"column(id);auto"`
 	AvailableStock float64      `orm:"column(available_stock)"`
 	InventoryId    *Inventories `orm:"column(inventory_id);rel(fk)"`
+	Date           time.Time    `orm:"column(updated_at);type(timestamp);null"`
 }
 
 func (t *Stocks) TableName() string {

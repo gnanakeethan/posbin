@@ -145,7 +145,6 @@ func UpdateSalesById(m *Sales, reset bool) (err error) {
 	if err = o.Read(&v); err == nil {
 		var num int64
 		logs.Error(v)
-		// mergo.Merge(&v, &m)
 		m.InventoryId = v.InventoryId
 		m.BillId = v.BillId
 		if m.Units == 0 {
@@ -168,14 +167,14 @@ func UpdateSalesById(m *Sales, reset bool) (err error) {
 
 		if len(list) > 0 {
 			//TODO: doing the stock calculation shit
-			// rem units must be deduced from the stock in the db
-			// the record to be created in tempstock and deduced from many
-			//this is something crazy to be done with things and so on that it does many things
+			// Each record must feature a datestamp
+			// Available stock must be added or reduced properly.
+
 			stockflow := &StockFlows{}
 			stockflow.StockableType = "Sales"
 			stockflow.StockableId = v.Id
+			
 			stockflow.InventoryId = v.InventoryId
-			//			dd, err := o.InsertOrUpdate(stockflow, "stockable_id", "stockable_type", "inventory_id")
 			if _, _, err := o.ReadOrCreate(stockflow, "stockable_id", "stockable_type", "inventory_id"); err == nil {
 				stockflow.Flow = remUnits
 				o.Update(stockflow)
