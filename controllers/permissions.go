@@ -76,6 +76,7 @@ func (c *PermissionsController) GetOne() {
 // @Success 200 {object} models.Permissions
 // @Failure 403
 // @router / [get]
+
 func (c *PermissionsController) GetAll() {
 	var fields []string
 	var sortby []string
