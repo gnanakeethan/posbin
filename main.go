@@ -33,7 +33,6 @@ func main() {
 	//Listens on 0.0.0.0 instead of ::0
 	beego.BConfig.Listen.ListenTCP4 = true
 
-
 	//Configuring HTTPs Mode
 	beego.BConfig.Listen.HTTPSCertFile = gC("certfile")
 	beego.BConfig.Listen.HTTPSKeyFile = gC("certkey")
@@ -41,17 +40,6 @@ func main() {
 	//Expose Swagger Directory
 	beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	beego.BConfig.WebConfig.DirectoryIndex = true
-
-	//Static Path Configurations
-	beego.SetStaticPath("/service-worker.js", gC("publicdir")+"/service-worker.js")
-	beego.SetStaticPath("/*.js", gC("publicdir")+"/bundle.js")
-	beego.SetStaticPath("/index.html", gC("publicdir")+"/index.html")
-	beego.SetStaticPath("/", gC("publicdir")+"/index.html")
-
-	//Static Directory Configurations
-	beego.BConfig.WebConfig.StaticDir["/bower_components"] = gC("publicdir") + "/bower_components"
-	beego.BConfig.WebConfig.StaticDir["/app"] = gC("publicdir");
-	beego.BConfig.WebConfig.StaticDir["/assets"] = gC("publicdir")+"/assets";
 
 	beego.Run()
 }
